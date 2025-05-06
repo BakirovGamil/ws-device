@@ -1,31 +1,34 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { Storage } from "@/storage.ts";
 
 export const useConnectionStore = defineStore("connection", () => {
   const isConnected = ref(false);
-  const serverAddress = ref("");
-  const savedAddresses = ref<string[]>([]);
+  const isConnecting = ref(false);
 
-  if (localStorage.getItem("savedAddresses")) {
-    savedAddresses.value = JSON.parse(localStorage.getItem("savedAddresses")!);
-  }
+  const storage = Storage.GetInstance();
+  const savedAddresses = storage.loadAddresses();
+
+  const recentAddress = ref(savedAddresses.recentAddress);
+  const addresses = ref<string[]>(savedAddresses.addresses);
 
   const connect = async (address: string) => {
+    isConnecting.value = true;
     try {
       isConnected.value = true;
-      serverAddress.value = address;
+      recentAddress.value = address;
+      storage.saveRecentAddress(address);
 
-      if (!savedAddresses.value.includes(address)) {
-        savedAddresses.value.push(address);
-        localStorage.setItem("savedAddresses", JSON.stringify(savedAddresses.value));
+      if (!addresses.value.includes(address)) {
+        addresses.value.push(address);
+        storage.saveAddresses(addresses.value);
       }
-
-      return true;
     } catch (error) {
       isConnected.value = false;
-      throw error;
+    } finally {
+      isConnecting.value = false;
     }
   };
 
-  return { isConnected, serverAddress, savedAddresses, connect };
+  return { isConnected, serverAddress: recentAddress, savedAddresses: addresses, connect };
 });
