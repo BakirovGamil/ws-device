@@ -1,23 +1,51 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import ConnectView from "@/views/ConnectView.vue";
+import { useConnectionStore } from "@/stores/connection.ts";
+
+enum PageName {
+  Connect = "connect",
+  Device = "device",
+  Cash = "cash",
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: HomeView,
+      path: "/",
+      name: PageName.Connect,
+      component: ConnectView,
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      path: "/device",
+      name: PageName.Device,
+      component: () => import("../views/DeviceView.vue"),
+      meta: { requiresConnection: true }
     },
+    {
+      path: "/cash",
+      name: PageName.Cash,
+      component: () => import("../views/CashView.vue"),
+      meta: { requiresConnection: true }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: { name: PageName.Connect }
+    }
   ],
-})
+});
 
-export default router
+router.beforeEach((to, from, next) => {
+  const connectionStore = useConnectionStore();
+  if (to.name === PageName.Connect) {
+    return next();
+  }
+
+  if (to.meta.requiresConnection && !connectionStore.isConnected) {
+    next({ name: PageName.Connect });
+  } else {
+    next();
+  }
+});
+
+export default router;
