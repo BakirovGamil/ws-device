@@ -2,9 +2,9 @@ import { createRouter, createWebHistory } from "vue-router";
 import ConnectView from "@/views/ConnectView.vue";
 import { useConnectionStore } from "@/stores/connection.ts";
 
-enum PageName {
+export enum PageName {
   Connect = "connect",
-  Device = "device",
+  Gate = "gate",
   Cash = "cash",
 }
 
@@ -17,21 +17,21 @@ const router = createRouter({
       component: ConnectView,
     },
     {
-      path: "/device",
-      name: PageName.Device,
-      component: () => import("../views/DeviceView.vue"),
-      meta: { requiresConnection: true }
+      path: "/gate",
+      name: PageName.Gate,
+      component: () => import("../views/GateView.vue"),
+      meta: { requiresConnection: true },
     },
     {
       path: "/cash",
       name: PageName.Cash,
       component: () => import("../views/CashView.vue"),
-      meta: { requiresConnection: true }
+      meta: { requiresConnection: true },
     },
     {
-      path: '/:pathMatch(.*)*',
-      redirect: { name: PageName.Connect }
-    }
+      path: "/:pathMatch(.*)*",
+      redirect: { name: PageName.Connect },
+    },
   ],
 });
 

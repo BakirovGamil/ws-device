@@ -12,15 +12,15 @@ export class Storage {
   }
 
   private RecentAddressKey = "recentAddress";
-  private AddressesKey = "addresses";
+  private AddressHistoryKey = "addresses";
 
   loadAddresses() {
     const recentAddress = this.getValue(this.RecentAddressKey, "");
-    const addresses = this.getValue(this.AddressesKey, [] as string[]);
+    const addressHistory = this.getValue(this.AddressHistoryKey, [] as string[]);
 
     return {
       recentAddress,
-      addresses,
+      addressHistory,
     };
   }
 
@@ -33,8 +33,8 @@ export class Storage {
     this.setValue(this.RecentAddressKey, address);
   }
 
-  saveAddresses(addresses: string[]) {
-    this.setValue(this.AddressesKey, addresses);
+  saveAddressHistory(addresses: string[]) {
+    this.setValue(this.AddressHistoryKey, addresses);
   }
 
   private setValue<T>(key: string, value: T) {

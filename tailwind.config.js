@@ -1,8 +1,12 @@
 /** @type {import("tailwindcss").Config} */
 export default {
-  content: ["./src/**/*.{js,vue,ts}"],
+  content: ["index.html", "./src/**/*.{js,vue,ts}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        error: "#e88080",
+      },
+    },
   },
   plugins: [],
 };
