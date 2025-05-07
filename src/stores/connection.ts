@@ -1,6 +1,6 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import { Storage } from "@/storage.ts";
+import { Storage } from "@/classes";
 
 export const useConnectionStore = defineStore("connection", () => {
   const isConnected = ref(false);
