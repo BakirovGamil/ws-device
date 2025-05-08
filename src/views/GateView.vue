@@ -1,20 +1,20 @@
 <template>
-  <DeviceLayout>
+  <DeviceLayout :state="state">
     <InputsRelays :inputs="inputs" :relays="relays" @set:input="onSetInput" />
+    <DeviceLogs :logs="logs" />
   </DeviceLayout>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { createEmptyInputsRelays } from "@/utils.ts";
 import type { SetInputEvent } from "@/types.ts";
 import InputsRelays from "@/components/InputsRelays.vue";
 import DeviceLayout from "@/layouts/DeviceLayout.vue";
+import DeviceLogs from "@/components/DeviceLogs.vue";
+import { useGateService } from "@/composables";
 
-const inputs = ref(createEmptyInputsRelays("inputs"));
-const relays = ref(createEmptyInputsRelays("relays"));
+const { state, inputs, relays, logs, setInput } = useGateService();
 
 const onSetInput = ({ num, enabled }: SetInputEvent) => {
-  inputs.value[`in${num}`] = enabled ? 1 : 0;
+  setInput(num, enabled);
 };
 </script>

@@ -1,6 +1,7 @@
-import { computed, shallowRef } from "vue";
+import { computed, ref, shallowRef } from "vue";
 import { defineStore } from "pinia";
-import { SocketService } from "@/services";
+import type { Config } from "@/types";
+import { SocketService } from "@/classes";
 import { useHistoryStore } from "@/stores/history.ts";
 
 export const useConnectionStore = defineStore("connection", () => {
@@ -18,6 +19,9 @@ export const useConnectionStore = defineStore("connection", () => {
   const pendingAddress = computed(() => (isConnecting.value ? pendingConnection.value!.address : null));
   const pendingError = computed(() => pendingConnection.value?.error.value || null);
 
+  const config = ref<Config | null>(null);
+  const deviceType = computed(() => (isConnected.value ? config.value?.deviceType || null : null));
+
   const connect = async (address: string) => {
     address = address.trim();
     if (!address) {
@@ -26,13 +30,23 @@ export const useConnectionStore = defineStore("connection", () => {
 
     history.promote(address);
     const socketService = new SocketService(address);
-    socketService.on("open", () => {
-      disconnectActiveSocket();
-      currentConnection.value = socketService;
-    });
-
+    socketService.on("open", () => onConnect(socketService));
     socketService.connect();
     pendingConnection.value = socketService;
+  };
+
+  const onConnect = (socket: SocketService) => {
+    disconnectActiveSocket();
+    currentConnection.value = socket;
+    const stopListen = socket.on("message", (event) => {
+      const { data: rawData } = event;
+      const { type, value } = JSON.parse(rawData);
+      if (type === "configUpdate") {
+        config.value = value;
+      }
+
+      stopListen();
+    });
   };
 
   const disconnectActiveSocket = () => {
@@ -53,6 +67,9 @@ export const useConnectionStore = defineStore("connection", () => {
   };
 
   return {
+    currentConnection,
+    pendingConnection,
+    deviceType,
     isConnecting,
     isConnected,
     currentAddress,

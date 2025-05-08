@@ -15,9 +15,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import DeviceState from "@/components/DeviceState.vue";
 import ConnectionSelector from "@/components/ConnectionSelector.vue";
 
-const state = ref("outOfService");
+interface Props {
+  state: string;
+}
+
+defineProps<Props>();
 </script>

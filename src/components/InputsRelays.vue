@@ -51,6 +51,6 @@ const groups = [
 ];
 
 const onUpdateBit = ({ index, enabled }: UpdateBitEvent) => {
-  emit("set:input", { num: index + 1, enabled });
+  emit("set:input", { num: index, enabled });
 };
 </script>
