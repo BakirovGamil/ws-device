@@ -23,7 +23,7 @@
         <div class="divide-y divide-zinc-700">
           <template v-for="address in addresses" :key="address">
             <div class="relative group/content cursor-pointer">
-              <div :class="itemClasses(address === store.connectionAddress)">
+              <div :class="itemClasses(address === pendingAddress)">
                 <button
                   title="Подключиться"
                   class="group w-full px-4 py-3 text-left hover:bg-zinc-750 transition-colors text-neutral-300"
@@ -48,7 +48,7 @@
                 </button>
               </div>
               <button
-                v-if="address === store.connectionAddress"
+                v-if="address === pendingAddress"
                 title="Отменить"
                 class="flex items-center justify-center absolute inset-0"
                 @click="onCancelConnection"
@@ -75,10 +75,14 @@
 import { computed } from "vue";
 import { NButton, NIcon, NScrollbar, NSpin } from "naive-ui";
 import { CloseRound, DeleteOutlineRound } from "@vicons/material";
+import { useHistoryStore } from "@/stores/history.ts";
 import { useConnectionStore } from "@/stores/connection.ts";
 
-const store = useConnectionStore();
-const addresses = computed(() => [...store.addressHistory].reverse());
+const connection = useConnectionStore();
+const history = useHistoryStore();
+
+const pendingAddress = computed(() => connection.pendingAddress);
+const addresses = computed(() => [...history.addressHistory].reverse());
 
 const itemClasses = (show: boolean) => {
   if (!show) {
@@ -89,18 +93,18 @@ const itemClasses = (show: boolean) => {
 };
 
 const onConnect = (address: string) => {
-  store.connect(address);
+  connection.connect(address);
 };
 
 const onCancelConnection = () => {
-  store.cancelConnection();
+  connection.cancelConnection();
 };
 
 const onRemove = (address: string) => {
-  store.removeAddress(address);
+  history.removeAddress(address);
 };
 
 const onRemoveAll = () => {
-  store.clearAddressHistory();
+  history.clearAddressHistory();
 };
 </script>

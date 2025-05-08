@@ -1,22 +1,22 @@
-import { computed, ref, shallowRef } from "vue";
+import { computed, shallowRef } from "vue";
 import { defineStore } from "pinia";
-import { Storage } from "@/classes";
 import { SocketService } from "@/services";
+import { useHistoryStore } from "@/stores/history.ts";
 
 export const useConnectionStore = defineStore("connection", () => {
-  const storage = Storage.GetInstance();
-  const savedAddresses = storage.loadAddresses();
+  const history = useHistoryStore();
 
-  const recentAddress = ref(savedAddresses.recentAddress);
-  const addressHistory = ref<string[]>(savedAddresses.addressHistory);
+  const currentConnection = shallowRef<SocketService | null>(null);
+  const pendingConnection = shallowRef<SocketService | null>(null);
 
-  const activeSocketService = shallowRef<SocketService | null>(null);
-  const connectionSocketService = shallowRef<SocketService | null>(null);
+  const isConnected = computed(() => currentConnection.value?.isConnected.value || false);
+  const isConnecting = computed(() => pendingConnection.value?.isConnecting.value || false);
 
-  const isConnected = computed(() => activeSocketService.value?.isConnected.value || false);
-  const isConnecting = computed(() => connectionSocketService.value?.isConnecting.value || false);
-  const activeAddress = computed(() => (isConnected.value ? activeSocketService.value!.address : null));
-  const connectionAddress = computed(() => (isConnecting.value ? connectionSocketService.value!.address : null));
+  const currentAddress = computed(() => (isConnected.value ? currentConnection.value!.address : null));
+  const currentError = computed(() => currentConnection.value?.error || null);
+
+  const pendingAddress = computed(() => (isConnecting.value ? pendingConnection.value!.address : null));
+  const pendingError = computed(() => pendingConnection.value?.error.value || null);
 
   const connect = async (address: string) => {
     address = address.trim();
@@ -24,22 +24,20 @@ export const useConnectionStore = defineStore("connection", () => {
       return;
     }
 
-    setRecentAddress(address);
-    updateAddressHistory(address);
-
+    history.promote(address);
     const socketService = new SocketService(address);
     socketService.on("open", () => {
       disconnectActiveSocket();
-      activeSocketService.value = socketService;
+      currentConnection.value = socketService;
     });
 
     socketService.connect();
-    connectionSocketService.value = socketService;
+    pendingConnection.value = socketService;
   };
 
   const disconnectActiveSocket = () => {
-    if (activeSocketService.value) {
-      activeSocketService.value.disconnect();
+    if (currentConnection.value) {
+      currentConnection.value.disconnect();
     }
   };
 
@@ -49,59 +47,20 @@ export const useConnectionStore = defineStore("connection", () => {
   };
 
   const cancelConnection = () => {
-    if (connectionSocketService.value) {
-      connectionSocketService.value.disconnect();
+    if (pendingConnection.value) {
+      pendingConnection.value.disconnect();
     }
-  };
-
-  const setRecentAddress = (address: string) => {
-    recentAddress.value = address;
-    storage.saveRecentAddress(address);
-  };
-
-  const updateAddressHistory = (address: string) => {
-    if (!addressHistory.value.includes(address)) {
-      addAddress(address);
-    } else {
-      hoistAddress(address);
-    }
-  };
-
-  const addAddress = (address: string) => {
-    addressHistory.value.push(address);
-    storage.saveAddressHistory(addressHistory.value);
-  };
-
-  const hoistAddress = (address: string) => {
-    const index = addressHistory.value.indexOf(address);
-    if (index > -1) {
-      addressHistory.value.splice(index, 1);
-      addressHistory.value.push(address);
-      storage.saveAddressHistory(addressHistory.value);
-    }
-  };
-
-  const clearAddressHistory = () => {
-    addressHistory.value = [];
-    storage.saveAddressHistory(addressHistory.value);
-  };
-
-  const removeAddress = async (address: string) => {
-    addressHistory.value = addressHistory.value.filter((a) => a !== address);
-    storage.saveAddressHistory(addressHistory.value);
   };
 
   return {
     isConnecting,
     isConnected,
-    recentAddress,
-    addressHistory,
-    activeAddress,
-    connectionAddress,
+    currentAddress,
+    currentError,
+    pendingAddress,
+    pendingError,
     connect,
     disconnect,
     cancelConnection,
-    removeAddress,
-    clearAddressHistory,
   };
 });

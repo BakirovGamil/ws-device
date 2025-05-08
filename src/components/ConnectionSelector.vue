@@ -1,6 +1,6 @@
 <template>
   <n-select
-    :value="activeAddress"
+    :value="currentAddress"
     :options="options"
     filterable
     tag
@@ -13,12 +13,15 @@
 import { computed, watch } from "vue";
 import { NSelect, useLoadingBar } from "naive-ui";
 import { useConnectionStore } from "@/stores/connection.ts";
+import { useHistoryStore } from "@/stores/history.ts";
 
-const store = useConnectionStore();
+const connection = useConnectionStore();
+const history = useHistoryStore();
 
-const isConnecting = computed(() => store.isConnecting);
-const activeAddress = computed(() => store.activeAddress);
-const addressHistory = computed(() => [...store.addressHistory].reverse());
+const isConnecting = computed(() => connection.isConnecting);
+const pendingError = computed(() => connection.pendingError);
+const currentAddress = computed(() => connection.currentAddress);
+const addressHistory = computed(() => [...history.addressHistory].reverse());
 
 const options = computed(() =>
   addressHistory.value.map((address) => ({
@@ -28,8 +31,7 @@ const options = computed(() =>
 );
 
 const onUpdateValue = (value: string) => {
-  console.log(value);
-  store.connect(value);
+  connection.connect(value);
 };
 
 const loadingBar = useLoadingBar();
@@ -38,6 +40,12 @@ watch(isConnecting, () => {
     loadingBar.start();
   } else {
     loadingBar.finish();
+  }
+});
+
+watch(pendingError, () => {
+  if (pendingError.value) {
+    loadingBar.error();
   }
 });
 </script>

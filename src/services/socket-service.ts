@@ -10,6 +10,7 @@ type SocketServiceEvents = {
 export class SocketService extends EventEmitter<SocketServiceEvents> {
   isConnecting = ref(false);
   isConnected = ref(false);
+  error = ref<Error | null>(null);
   url: string;
   address: string;
   socket: WebSocket | null = null;
@@ -26,12 +27,13 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
     }
 
     this.isConnecting.value = true;
+    this.error.value = null;
     try {
       this.socket = new WebSocket(this.url);
       this.setUpSocketListeners(this.socket);
     } catch (err) {
-      console.error(err);
       this.isConnecting.value = false;
+      this.error.value = err;
     }
   }
 
@@ -76,6 +78,7 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
 
   private onError(ev: Event) {
     this.cleanUpState();
+    this.error = new Error("Socket error");
     this.emit("error", ev);
   }
 }

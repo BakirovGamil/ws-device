@@ -15,18 +15,27 @@ const router = createRouter({
       path: "/",
       name: PageName.Connect,
       component: ConnectView,
+      meta: {
+        title: "Подключение",
+      },
     },
     {
       path: "/gate",
       name: PageName.Gate,
       component: () => import("../views/GateView.vue"),
-      meta: { requiresConnection: true },
+      meta: {
+        title: "Стойка",
+        requiresConnection: true,
+      },
     },
     {
       path: "/cash",
       name: PageName.Cash,
       component: () => import("../views/CashView.vue"),
-      meta: { requiresConnection: true },
+      meta: {
+        title: "Паркомат",
+        requiresConnection: true,
+      },
     },
     {
       path: "/:pathMatch(.*)*",

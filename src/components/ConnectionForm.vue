@@ -18,18 +18,21 @@ import { DEFAULT_ADDRESS } from "@/defaults.ts";
 import { NButton, NIcon, NInput } from "naive-ui";
 import { CloseRound, LogInRound } from "@vicons/material";
 import { useConnectionStore } from "@/stores/connection.ts";
+import { useHistoryStore } from "@/stores/history.ts";
 
-const store = useConnectionStore();
-const address = ref(store.recentAddress || DEFAULT_ADDRESS);
-const isConnecting = computed(() => address.value === store.connectionAddress);
+const connection = useConnectionStore();
+const history = useHistoryStore();
+
+const address = ref(history.recentAddress || DEFAULT_ADDRESS);
+const isConnecting = computed(() => address.value === connection.pendingAddress);
 const buttonType = computed(() => (isConnecting.value ? "error" : "primary"));
 const buttonTooltip = computed(() => (isConnecting.value ? "Отменить" : "Подключиться"));
 
 function onClick() {
   if (isConnecting.value) {
-    store.cancelConnection();
+    connection.cancelConnection();
   } else {
-    store.connect(address.value || DEFAULT_ADDRESS);
+    connection.connect(address.value || DEFAULT_ADDRESS);
   }
 }
 </script>
