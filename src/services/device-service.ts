@@ -11,9 +11,13 @@ type DeviceServiceEvents = {
 };
 
 export abstract class DeviceService extends EventEmitter<DeviceServiceEvents> {
-  constructor(private readonly socket: WebSocket) {
-    super();
-    socket.onmessage = (event: MessageEvent) => this.onMessage(event);
+  private socket: WebSocket | null = null;
+
+  setSocket(socket: WebSocket | null) {
+    this.socket = socket;
+    if (socket !== null) {
+      socket.onmessage = (event: MessageEvent) => this.onMessage(event);
+    }
   }
 
   private onMessage(event: MessageEvent) {
@@ -47,6 +51,10 @@ export abstract class DeviceService extends EventEmitter<DeviceServiceEvents> {
   }
 
   protected send(data: Record<string, unknown>) {
+    if (!this.socket) {
+      return;
+    }
+
     this.socket.send(JSON.stringify(data));
   }
 

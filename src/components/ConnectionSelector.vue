@@ -1,6 +1,6 @@
 <template>
   <n-select
-    :value="connectedAddress"
+    :value="activeAddress"
     :options="options"
     filterable
     tag
@@ -17,7 +17,7 @@ import { useConnectionStore } from "@/stores/connection.ts";
 const store = useConnectionStore();
 
 const isConnecting = computed(() => store.isConnecting);
-const connectedAddress = computed(() => store.connectedAddress);
+const activeAddress = computed(() => store.activeAddress);
 const addressHistory = computed(() => [...store.addressHistory].reverse());
 
 const options = computed(() =>

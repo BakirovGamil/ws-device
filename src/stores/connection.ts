@@ -1,46 +1,57 @@
-import { computed, ref } from "vue";
+import { computed, ref, shallowRef } from "vue";
 import { defineStore } from "pinia";
 import { Storage } from "@/classes";
+import { SocketService } from "@/services";
 
 export const useConnectionStore = defineStore("connection", () => {
-  const isConnected = ref(false);
-  const isConnecting = ref(false);
-  const connectedAddress = computed(() => (isConnected.value ? recentAddress.value : null));
-  const connectionAddress = computed(() => (isConnecting.value ? recentAddress.value : null));
-
   const storage = Storage.GetInstance();
   const savedAddresses = storage.loadAddresses();
 
   const recentAddress = ref(savedAddresses.recentAddress);
   const addressHistory = ref<string[]>(savedAddresses.addressHistory);
 
+  const activeSocketService = shallowRef<SocketService | null>(null);
+  const connectionSocketService = shallowRef<SocketService | null>(null);
+
+  const isConnected = computed(() => activeSocketService.value?.isConnected.value || false);
+  const isConnecting = computed(() => connectionSocketService.value?.isConnecting.value || false);
+  const activeAddress = computed(() => (isConnected.value ? activeSocketService.value!.address : null));
+  const connectionAddress = computed(() => (isConnecting.value ? connectionSocketService.value!.address : null));
+
   const connect = async (address: string) => {
     address = address.trim();
     if (!address) {
-      isConnecting.value = false;
       return;
     }
 
-    isConnecting.value = true;
-    try {
-      setRecentAddress(address);
-      updateAddressHistory(address);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      isConnected.value = true;
-    } catch (error) {
-      isConnected.value = false;
-    } finally {
-      isConnecting.value = false;
+    setRecentAddress(address);
+    updateAddressHistory(address);
+
+    const socketService = new SocketService(address);
+    socketService.on("open", () => {
+      disconnectActiveSocket();
+      activeSocketService.value = socketService;
+    });
+
+    socketService.connect();
+    connectionSocketService.value = socketService;
+  };
+
+  const disconnectActiveSocket = () => {
+    if (activeSocketService.value) {
+      activeSocketService.value.disconnect();
     }
   };
 
   const disconnect = () => {
     cancelConnection();
-    isConnected.value = false;
+    disconnectActiveSocket();
   };
 
   const cancelConnection = () => {
-    isConnecting.value = false;
+    if (connectionSocketService.value) {
+      connectionSocketService.value.disconnect();
+    }
   };
 
   const setRecentAddress = (address: string) => {
@@ -85,7 +96,7 @@ export const useConnectionStore = defineStore("connection", () => {
     isConnected,
     recentAddress,
     addressHistory,
-    connectedAddress,
+    activeAddress,
     connectionAddress,
     connect,
     disconnect,
