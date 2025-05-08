@@ -5,6 +5,7 @@ import { Storage } from "@/classes";
 export const useConnectionStore = defineStore("connection", () => {
   const isConnected = ref(false);
   const isConnecting = ref(false);
+  const connectedAddress = computed(() => (isConnected.value ? recentAddress.value : null));
   const connectionAddress = computed(() => (isConnecting.value ? recentAddress.value : null));
 
   const storage = Storage.GetInstance();
@@ -24,7 +25,7 @@ export const useConnectionStore = defineStore("connection", () => {
     try {
       setRecentAddress(address);
       updateAddressHistory(address);
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       isConnected.value = true;
     } catch (error) {
       isConnected.value = false;
@@ -84,6 +85,7 @@ export const useConnectionStore = defineStore("connection", () => {
     isConnected,
     recentAddress,
     addressHistory,
+    connectedAddress,
     connectionAddress,
     connect,
     disconnect,

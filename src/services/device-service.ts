@@ -10,7 +10,7 @@ type DeviceServiceEvents = {
   log: string;
 };
 
-abstract class DeviceService extends EventEmitter<DeviceServiceEvents> {
+export abstract class DeviceService extends EventEmitter<DeviceServiceEvents> {
   constructor(private readonly socket: WebSocket) {
     super();
     socket.onmessage = (event: MessageEvent) => this.onMessage(event);

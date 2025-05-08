@@ -1,23 +1,16 @@
 export type Bit = 0 | 1;
+export type InputKey = `in1` | `in2` | `in3` | `in4` | `in5` | `in6` | `in7` | `in8`;
+export type RelayKey = `r1` | `r2` | `r3` | `r4` | `r5` | `r6` | `r7` | `r8`;
+export type Inputs = Record<InputKey, Bit>;
+export type Relays = Record<RelayKey, Bit>;
 
-export interface Inputs {
-  in1: Bit;
-  in2: Bit;
-  in3: Bit;
-  in4: Bit;
-  in5: Bit;
-  in6: Bit;
-  in7: Bit;
-  in8: Bit;
+
+export interface UpdateBitEvent {
+  index: number;
+  enabled: boolean;
 }
 
-export interface Relays {
-  r1: Bit;
-  r2: Bit;
-  r3: Bit;
-  r4: Bit;
-  r5: Bit;
-  r6: Bit;
-  r7: Bit;
-  r8: Bit;
+export interface SetInputEvent {
+  num: number;
+  enabled: boolean;
 }
