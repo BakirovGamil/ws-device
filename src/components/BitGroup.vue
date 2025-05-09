@@ -13,6 +13,7 @@
           'bg-blue-500': bit && !editable,
         }"
         @click="editable && $emit('update:bit', { index, enabled: !bit })"
+        @dblclick="editable && $emit('update:bit', { index, enabled: !!bit })"
       />
     </div>
   </div>

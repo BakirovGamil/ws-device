@@ -82,6 +82,13 @@ export function useDeviceService() {
     });
   };
 
+  const setState = (state: string) => {
+    send({
+      type: "mock.SetState",
+      state,
+    });
+  };
+
   return {
     state: readonly(state),
     logs: readonly(logs),
@@ -92,6 +99,7 @@ export function useDeviceService() {
     setSocket,
     send,
     setInput,
+    setState,
 
     on: emitter.on.bind(emitter),
     off: emitter.off.bind(emitter),

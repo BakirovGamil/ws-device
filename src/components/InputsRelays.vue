@@ -18,7 +18,7 @@ import type { Inputs, Relays, SetInputEvent, UpdateBitEvent } from "@/types.ts";
 import BitGroup from "@/components/BitGroup.vue";
 
 interface Emits {
-  (e: "set:input", event: SetInputEvent);
+  (e: "set:input", event: SetInputEvent): void;
 }
 
 interface Props {

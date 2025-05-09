@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex flex-col bg-zinc-800 rounded-lg shadow-lg overflow-hidden">
-    <div class="flex justify-between p-4 border-b border-zinc-700">
-      <h3 class="h-6 font-medium text-neutral-200">История подключений</h3>
+    <div class="flex items-center justify-between p-4 border-b border-zinc-700">
+      <h3 class="font-medium text-neutral-200">История подключений</h3>
       <n-button
         v-if="addresses.length > 0"
         title="Удалить все"
