@@ -5,6 +5,7 @@ import { useConnectionStore } from "@/stores/connection";
 export function useConnectedDeviceService() {
   const service = useDeviceService();
   const connection = useConnectionStore();
+  let timeout: ReturnType<typeof setTimeout>;
 
   watch(
     () => connection.currentConnection,
@@ -17,8 +18,9 @@ export function useConnectedDeviceService() {
       // cannot accurately determine the current state,
       // we explicitly set both states to ensure
       // they are updated correctly
+      clearTimeout(timeout);
       service.setInput(0, true);
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         service.setInput(0, false);
       }, 500);
     },
@@ -26,6 +28,7 @@ export function useConnectedDeviceService() {
   );
 
   onUnmounted(() => {
+    clearTimeout(timeout);
     service.setSocket(null);
   });
 

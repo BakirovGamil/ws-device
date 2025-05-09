@@ -1,4 +1,4 @@
-import { computed, ref, shallowRef } from "vue";
+import { computed, ref, shallowRef, watch } from "vue";
 import { defineStore } from "pinia";
 import type { Config } from "@/types";
 import { SocketService } from "@/classes";
@@ -22,6 +22,10 @@ export const useConnectionStore = defineStore("connection", () => {
   const config = ref<Config | null>(null);
   const deviceType = computed(() => (isConnected.value ? config.value?.deviceType || null : null));
 
+  watch(deviceType, () => {
+    console.log("DEVICE TYPE", deviceType.value);
+  });
+
   const connect = async (address: string) => {
     address = address.trim();
     if (!address) {
@@ -30,6 +34,7 @@ export const useConnectionStore = defineStore("connection", () => {
 
     history.promote(address);
     const socketService = new SocketService(address);
+    socketService.enableQueue();
     socketService.on("open", () => onConnect(socketService));
     socketService.connect();
     pendingConnection.value = socketService;
@@ -38,7 +43,7 @@ export const useConnectionStore = defineStore("connection", () => {
   const onConnect = (socket: SocketService) => {
     disconnectCurrentSocket();
     currentConnection.value = socket;
-    socket.enableQueue();
+    config.value = null;
     const stopListen = socket.on("receivedMessage", (event) => {
       const { data: rawData } = event;
       const { type, value } = JSON.parse(rawData);

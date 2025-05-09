@@ -46,7 +46,7 @@
         round
       >
         <template #icon>
-          <n-icon class="text-lg">
+          <n-icon class="text-lg translate-x-[2px]">
             <send-round />
           </n-icon>
         </template>

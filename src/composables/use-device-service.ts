@@ -22,6 +22,7 @@ export function useDeviceService() {
   const setSocket = (newSocket: SocketService | null) => {
     socket.value?.off("message", onMessage);
     resetState();
+
     socket.value = newSocket;
     socket.value?.on("message", onMessage);
   };

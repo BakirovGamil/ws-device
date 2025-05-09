@@ -3,6 +3,7 @@ import { EventEmitter } from "@/classes/index.ts";
 
 type SocketServiceEvents = {
   receivedMessage: MessageEvent;
+  queue: boolean;
   message: MessageEvent;
   open: Event;
   close: CloseEvent;
@@ -61,12 +62,16 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
   }
 
   enableQueue() {
+    console.log("queue enabled");
     this.queueEnabled = true;
+    this.emit("queue", true);
   }
 
   disableQueue() {
+    console.log("queue disabled");
     this.queueEnabled = false;
     this.flushQueue();
+    this.emit("queue", false);
   }
 
   private flushQueue() {
@@ -75,10 +80,8 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
       return;
     }
 
-    for (let i = 0; i < this.queue.length; i++) {
-      this.onMessage(this.queue[i]);
-    }
-
+    console.log(`queue length ${this.queue.length}`);
+    this.queue.forEach(this.processMessage.bind(this));
     this.queue.length = 0;
   }
 
@@ -120,7 +123,11 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
 
   private onMessage(ev: MessageEvent) {
     this.emit("receivedMessage", ev);
+    console.count("message");
+    this.processMessage(ev);
+  }
 
+  private processMessage(ev: MessageEvent) {
     if (this.queueEnabled) {
       this.queue.push(ev);
     } else {
