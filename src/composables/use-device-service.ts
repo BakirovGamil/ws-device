@@ -1,11 +1,11 @@
 import { readonly, ref, shallowRef } from "vue";
 import { createEmptyInputsRelays } from "@/utils";
 import { EventEmitter, SocketService } from "@/classes";
-import type { CardData, DeviceServiceEvents, Inputs, MessageData, Relays } from "@/types";
+import type { CardData, DeviceServiceEvents, Inputs, Log, LogLevel, MessageData, Relays } from "@/types";
 
 export function useDeviceService() {
   const state = ref("Неизвестный статус");
-  const logs = ref<string[]>([]);
+  const logs = ref<Log[]>([]);
   const inputs = ref(createEmptyInputsRelays("inputs"));
   const relays = ref(createEmptyInputsRelays("relays"));
 
@@ -35,15 +35,54 @@ export function useDeviceService() {
     }
   };
 
+  const pushLog = (log: Log) => {
+    logs.value.push(log);
+    emitter.emit("log", log);
+  };
+
+  const logOutgoing = (data: Record<string, unknown>) => {
+    const log: Log = {
+      type: "outgoing",
+      level: "default",
+      data: data,
+    };
+
+    pushLog(log);
+  };
+
+  const getLevel = (data: MessageData): LogLevel => {
+    const { type } = data;
+    if (type === "info") {
+      return "info";
+    }
+
+    if (type === "error") {
+      return "error";
+    }
+
+    return "default";
+  };
+
+  const logIncoming = (data: MessageData) => {
+    const { type, state } = data;
+    if (state === "Ping" || ["inputs", "relays"].includes(type as never)) {
+      return;
+    }
+
+    const log: Log = {
+      type: "incoming",
+      level: getLevel(data),
+      data: data,
+    };
+
+    pushLog(log);
+  };
+
   const processMessage = (data: MessageData, event: MessageEvent) => {
-    const { type, state: msgState, value } = data;
+    const { type, value } = data;
 
     emitter.emit("data", data);
-
-    if (msgState !== "Ping" && type !== "inputs" && type !== "relays") {
-      logs.value.push(event.data);
-      emitter.emit("log", event.data);
-    }
+    logIncoming(data);
 
     switch (type) {
       case "inputs":
@@ -67,6 +106,7 @@ export function useDeviceService() {
 
   const send = (data: Record<string, unknown>) => {
     if (!socket.value) return;
+    logOutgoing(data);
     socket.value.send(JSON.stringify(data));
   };
 

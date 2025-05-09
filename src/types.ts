@@ -24,10 +24,18 @@ export type DeviceServiceEvents = {
   inputs: Inputs;
   relays: Relays;
   newState: string;
-  log: string;
+  log: Log;
 };
 
 export type CardData = {
   address: number;
   code: string;
+};
+
+export type LogType = "outgoing" | "incoming";
+export type LogLevel = "default" | "info" | "error";
+export type Log = {
+  type: LogType;
+  level: LogLevel;
+  data: Record<string, unknown>;
 };
