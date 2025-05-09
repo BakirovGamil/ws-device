@@ -123,7 +123,7 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
 
   private onMessage(ev: MessageEvent) {
     this.emit("receivedMessage", ev);
-    console.count("message");
+    // console.count("message");
     this.processMessage(ev);
   }
 

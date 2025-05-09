@@ -1,5 +1,5 @@
 <template>
-  <n-tag class="text-lg" :title="title" :type="level" :bordered="false">
+  <n-tag class="text-base" :title="title" :type="level" :bordered="false">
     <n-icon class="translate-y-[2px]">
       <component :is="icon" />
     </n-icon>

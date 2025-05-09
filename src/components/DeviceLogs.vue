@@ -8,34 +8,44 @@
         <h3>Логи</h3>
       </div>
       <div class="log-controls">
-        <div class="log-filters">
-          <n-switch v-model:value="showOutgoing">
-            <template #icon>
-              <LogTypeIcon class="text-xl" type="outgoing" />
-            </template>
-          </n-switch>
-          <n-switch v-model:value="showIncoming">
-            <template #icon>
-              <LogTypeIcon class="text-xl" type="incoming" />
-            </template>
-          </n-switch>
-        </div>
-        <n-button size="small" @click="clearLogs">
+
+        <n-button title="Очистить" class="h-8 px-2" size="small" @click="clearLogs">
           <template #icon>
             <n-icon>
               <delete-outline-round />
             </n-icon>
           </template>
-          Очистить
         </n-button>
       </div>
     </div>
 
+    <div class="log-filters p-4">
+      <n-input class="!w-72 flex-none" v-model:value="searchText" placeholder="Поиск" clearable />
+      <n-select
+        class="w-72 flex-none"
+        placeholder="Уровень"
+        v-model:value="levelFilter"
+        :options="levelOptions"
+        multiple
+        clearable
+      />
+      <n-switch title="Отображать исходящие" v-model:value="showOutgoing">
+        <template #icon>
+          <LogTypeIcon class="text-xl" type="outgoing" />
+        </template>
+      </n-switch>
+      <n-switch title="Отображать входящие" v-model:value="showIncoming">
+        <template #icon>
+          <LogTypeIcon class="text-xl" type="incoming" />
+        </template>
+      </n-switch>
+    </div>
+
     <n-scrollbar class="log-container" content-class="log-list">
-      <template v-if="!formattedLogs.length">
-        <n-empty />
+      <template v-if="!postFilteredLogs.length">
+        <n-empty class="py-12" />
       </template>
-      <div v-for="(log, index) in formattedLogs" :key="index" class="log-entry">
+      <div v-for="(log, index) in postFilteredLogs" :key="index" class="log-entry">
         <div class="flex gap-2 mb-2 items-center">
           <LogTypeTag :type="log.type" />
           <LogLevelTag :level="log.level" />
@@ -48,12 +58,12 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { NButton, NCode, NEmpty, NIcon, NScrollbar, NSwitch } from "naive-ui";
+import { NButton, NCode, NEmpty, NIcon, NInput, NScrollbar, NSelect, NSwitch } from "naive-ui";
 import { CodeRound, DeleteOutlineRound } from "@vicons/material";
 import { useLocalStorage } from "@vueuse/core";
 import hljs from "highlight.js/lib/core";
 import json from "highlight.js/lib/languages/json";
-import type { Log } from "@/types.ts";
+import type { Log, LogLevel } from "@/types.ts";
 import LogTypeIcon from "@/components/LogTypeIcon.vue";
 import LogTypeTag from "@/components/LogTypeTag.vue";
 import LogLevelTag from "@/components/LogLevelTag.vue";
@@ -71,14 +81,16 @@ interface Props {
 const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 
+const levelFilter = useLocalStorage<LogLevel[]>("levelLog", []);
+const searchText = useLocalStorage("searchTextLogs", "");
 const showOutgoing = useLocalStorage("outgoingLogs", true);
 const showIncoming = useLocalStorage("incomingLogs", true);
-const filteredLogs = computed(() => {
+const preFilteredLogs = computed(() => {
   const result: Log[] = [];
   for (let i = 0; i < props.logs.length; i++) {
     const index = props.logs.length - 1 - i;
     const log = props.logs[index];
-    const { type } = log;
+    const { type, level } = log;
 
     let isMatch = false;
     if (showOutgoing.value && type === "outgoing") {
@@ -89,6 +101,10 @@ const filteredLogs = computed(() => {
       isMatch = true;
     }
 
+    if (levelFilter.value.length) {
+      isMatch = levelFilter.value.includes(level);
+    }
+
     if (isMatch) {
       result.push(log);
     }
@@ -97,7 +113,27 @@ const filteredLogs = computed(() => {
   return result;
 });
 
-const formattedLogs = computed(() => filteredLogs.value.map(formatLog));
+const formattedLogs = computed(() => preFilteredLogs.value.map(formatLog));
+const postFilteredLogs = computed(() =>
+  formattedLogs.value.filter((log) => {
+    return log.data.includes(searchText.value);
+  }),
+);
+
+const levelOptions: { label: string; value: LogLevel }[] = [
+  {
+    label: "Основной",
+    value: "default",
+  },
+  {
+    label: "Информация",
+    value: "info",
+  },
+  {
+    label: "Ошибка",
+    value: "error",
+  },
+];
 
 const clearLogs = () => {
   emit("clear");
@@ -140,7 +176,7 @@ const formatLog = (log: Log) => {
 }
 
 :deep(.log-list) {
-  @apply p-4 space-y-3;
+  @apply p-4 pt-0 space-y-3;
 }
 
 .log-entry {

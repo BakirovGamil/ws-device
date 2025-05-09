@@ -55,7 +55,7 @@
               >
                 <n-spin size="small" />
                 <n-icon
-                  class="text-xl text-error transition-opacity opacity-0 group-hover/content:opacity-100 absolute top-1/2 -translate-y-1/2 right-5"
+                  class="text-xl text-error transition-opacity opacity-0 group-hover/content:opacity-100 absolute top-1/2 -translate-y-1/2"
                 >
                   <close-round />
                 </n-icon>

@@ -11,7 +11,7 @@
       <div class="grid grid-cols-2 gap-4 bg-zinc-800 rounded-lg shadow-lg overflow-hidden p-4">
         <StateInput :state="state" @set:state="onSetState" />
         <ErrorInput @set:error="onSetError" />
-        <CardInput @set:error="onSendCard" />
+        <CardInput @send:card="onSendCard" />
       </div>
       <DeviceLogs :logs="logs" @clear="onClearLogs" />
     </main>
