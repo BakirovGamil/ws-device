@@ -26,3 +26,8 @@ export type DeviceServiceEvents = {
   newState: string;
   log: string;
 };
+
+export type CardData = {
+  address: number;
+  code: string;
+};

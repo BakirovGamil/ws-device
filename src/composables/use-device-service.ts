@@ -1,7 +1,7 @@
 import { readonly, ref, shallowRef } from "vue";
 import { createEmptyInputsRelays } from "@/utils";
 import { EventEmitter, SocketService } from "@/classes";
-import type { DeviceServiceEvents, Inputs, MessageData, Relays } from "@/types";
+import type { CardData, DeviceServiceEvents, Inputs, MessageData, Relays } from "@/types";
 
 export function useDeviceService() {
   const state = ref("Неизвестный статус");
@@ -96,6 +96,17 @@ export function useDeviceService() {
     });
   };
 
+  const sendCard = (cardData: CardData) => {
+    const { code, address } = cardData;
+
+    send({
+      unit: "debugBoard",
+      type: "mock.setCardID",
+      "card-id": code,
+      "card-addr": address.toString(),
+    });
+  };
+
   return {
     state: readonly(state),
     logs: readonly(logs),
@@ -108,6 +119,7 @@ export function useDeviceService() {
     setInput,
     setState,
     setError,
+    sendCard,
 
     on: emitter.on.bind(emitter),
     off: emitter.off.bind(emitter),

@@ -2,7 +2,7 @@
   <n-input-group>
     <n-input-group-label class="flex items-center justify-center">
       <n-icon>
-        <LanRound />
+        <lan-round />
       </n-icon>
     </n-input-group-label>
     <n-select
