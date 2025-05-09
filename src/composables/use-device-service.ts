@@ -89,6 +89,13 @@ export function useDeviceService() {
     });
   };
 
+  const setError = (error: string) => {
+    send({
+      type: "mock.SetError",
+      errorData: error,
+    });
+  };
+
   return {
     state: readonly(state),
     logs: readonly(logs),
@@ -100,6 +107,7 @@ export function useDeviceService() {
     send,
     setInput,
     setState,
+    setError,
 
     on: emitter.on.bind(emitter),
     off: emitter.off.bind(emitter),

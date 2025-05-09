@@ -64,7 +64,7 @@ const formatLogContent = (log: string) => {
 
 <style scoped>
 .log-viewer {
-  @apply h-full flex flex-col h-full bg-zinc-800 rounded-lg shadow-lg overflow-hidden;
+  @apply h-full flex flex-col bg-zinc-800 rounded-lg shadow-lg overflow-hidden;
 }
 
 .log-header {

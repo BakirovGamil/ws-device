@@ -1,17 +1,25 @@
 <template>
-  <n-select
-    :value="currentAddress"
-    :options="options"
-    filterable
-    tag
-    :loading="isConnecting"
-    @update:value="onUpdateValue"
-  />
+  <n-input-group>
+    <n-input-group-label class="flex items-center justify-center">
+      <n-icon>
+        <LanRound />
+      </n-icon>
+    </n-input-group-label>
+    <n-select
+      :value="currentAddress"
+      :options="options"
+      filterable
+      tag
+      :loading="isConnecting"
+      @update:value="onUpdateValue"
+    />
+  </n-input-group>
 </template>
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { NSelect, useLoadingBar } from "naive-ui";
+import { LanRound } from "@vicons/material";
+import { NIcon, NInputGroup, NInputGroupLabel, NSelect, useLoadingBar } from "naive-ui";
 import { useConnectionStore } from "@/stores/connection.ts";
 import { useHistoryStore } from "@/stores/history.ts";
 
