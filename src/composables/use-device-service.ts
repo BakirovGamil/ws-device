@@ -70,6 +70,10 @@ export function useDeviceService() {
     socket.value.send(JSON.stringify(data));
   };
 
+  const clearLogs = () => {
+    logs.value = [];
+  };
+
   const setInput = (input: number, enabled: boolean) => {
     send({
       type: "mock.setSingleInput",
@@ -84,6 +88,7 @@ export function useDeviceService() {
     inputs: readonly(inputs),
     relays: readonly(relays),
 
+    clearLogs,
     setSocket,
     send,
     setInput,

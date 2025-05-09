@@ -10,6 +10,7 @@ export function useConnectedDeviceService() {
     () => connection.currentConnection,
     (socket) => {
       service.setSocket(socket);
+      socket?.disableQueue();
     },
     { immediate: true },
   );

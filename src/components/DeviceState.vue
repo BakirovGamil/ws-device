@@ -1,5 +1,5 @@
 <template>
-  <n-tag :bordered="false" :type="type">
+  <n-tag title="Состояние устройства" :bordered="false" :type="type">
     {{ state }}
   </n-tag>
 </template>

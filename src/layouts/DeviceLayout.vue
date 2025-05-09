@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <header class="sticky w-full top-0 left-0 bg-neutral-950">
+  <div class="h-full">
+    <header class="sticky w-full top-0 left-0 bg-neutral-950 z-50">
       <div class="flex gap-2 max-w-screen-xl p-4 mx-auto bg-zinc text-neutral-200">
         <ConnectionSelector class="max-w-56" />
         <div>
@@ -8,7 +8,7 @@
         </div>
       </div>
     </header>
-    <main class="max-w-screen-xl mx-auto p-4 sm:pt-10 bg-zinc-900">
+    <main class="max-w-screen-xl mx-auto h-full p-4 sm:pt-10 bg-zinc-900">
       <slot />
     </main>
   </div>

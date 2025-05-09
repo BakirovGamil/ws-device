@@ -36,9 +36,10 @@ export const useConnectionStore = defineStore("connection", () => {
   };
 
   const onConnect = (socket: SocketService) => {
-    disconnectActiveSocket();
+    disconnectCurrentSocket();
     currentConnection.value = socket;
-    const stopListen = socket.on("message", (event) => {
+    socket.enableQueue();
+    const stopListen = socket.on("receivedMessage", (event) => {
       const { data: rawData } = event;
       const { type, value } = JSON.parse(rawData);
       if (type === "configUpdate") {
@@ -49,7 +50,7 @@ export const useConnectionStore = defineStore("connection", () => {
     });
   };
 
-  const disconnectActiveSocket = () => {
+  const disconnectCurrentSocket = () => {
     if (currentConnection.value) {
       currentConnection.value.disconnect();
     }
@@ -57,7 +58,7 @@ export const useConnectionStore = defineStore("connection", () => {
 
   const disconnect = () => {
     cancelConnection();
-    disconnectActiveSocket();
+    disconnectCurrentSocket();
   };
 
   const cancelConnection = () => {

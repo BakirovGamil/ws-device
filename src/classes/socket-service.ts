@@ -2,6 +2,7 @@ import { ref } from "vue";
 import { EventEmitter } from "@/classes/index.ts";
 
 type SocketServiceEvents = {
+  receivedMessage: MessageEvent;
   message: MessageEvent;
   open: Event;
   close: CloseEvent;
@@ -16,6 +17,9 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
   isConnecting = ref(false);
   isConnected = ref(false);
   error = ref<Error | null>(null);
+
+  private queueEnabled = false;
+  private queue: MessageEvent[] = [];
 
   constructor(address: string) {
     super();
@@ -56,6 +60,28 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
     }
   }
 
+  enableQueue() {
+    this.queueEnabled = true;
+  }
+
+  disableQueue() {
+    this.queueEnabled = false;
+    this.flushQueue();
+  }
+
+  private flushQueue() {
+    if (this.queueEnabled) {
+      console.warn("Cannot flush queue");
+      return;
+    }
+
+    for (let i = 0; i < this.queue.length; i++) {
+      this.onMessage(this.queue[i]);
+    }
+
+    this.queue.length = 0;
+  }
+
   private setupSocketListeners(socket: WebSocket) {
     socket.onopen = (ev: Event) => this.onOpen(ev);
     socket.onclose = (ev: CloseEvent) => this.onClose(ev);
@@ -93,6 +119,12 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
   }
 
   private onMessage(ev: MessageEvent) {
-    this.emit("message", ev);
+    this.emit("receivedMessage", ev);
+
+    if (this.queueEnabled) {
+      this.queue.push(ev);
+    } else {
+      this.emit("message", ev);
+    }
   }
 }
