@@ -1,5 +1,6 @@
-import type { Bit, Inputs, Relays } from "@/types.ts";
+import { PageName } from "@/router";
 import { INPUTS_RELAYS_COUNT } from "@/defaults.ts";
+import type { Bit, Inputs, Relays } from "@/types.ts";
 
 export function createEmptyInputsRelays(type: "inputs"): Inputs;
 export function createEmptyInputsRelays(type: "relays"): Relays;
@@ -27,4 +28,16 @@ export function toBits(value: Inputs | Relays): Bit[] {
   }
 
   return result;
+}
+
+export function getPageByDeviceType(type: unknown): PageName {
+  const DEVICE_ROUTES: Record<string, PageName> = {
+    IN: PageName.Gate,
+    OUT: PageName.Gate,
+    CASH: PageName.Cash,
+
+    DEFAULT: PageName.Connect,
+  };
+
+  return DEVICE_ROUTES[type] || DEVICE_ROUTES.DEFAULT;
 }

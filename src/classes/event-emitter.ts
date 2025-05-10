@@ -1,6 +1,6 @@
 import mitt, { type EventType, type Handler } from "mitt";
 
-type StopListen = () => void;
+export type StopListen = () => void;
 
 export class EventEmitter<Events extends Record<EventType, unknown>> {
   protected emitter = mitt<Events>();

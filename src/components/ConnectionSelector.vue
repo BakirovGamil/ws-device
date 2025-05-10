@@ -6,6 +6,7 @@
       </n-icon>
     </n-input-group-label>
     <n-select
+      :key="key"
       :value="currentAddress"
       :options="options"
       filterable
@@ -17,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { LanRound } from "@vicons/material";
 import { NIcon, NInputGroup, NInputGroupLabel, NSelect, useLoadingBar } from "naive-ui";
 import { useConnectionStore } from "@/stores/connection.ts";
@@ -26,6 +27,7 @@ import { useHistoryStore } from "@/stores/history.ts";
 const connection = useConnectionStore();
 const history = useHistoryStore();
 
+const key = ref(0);
 const isConnecting = computed(() => connection.isConnecting);
 const pendingError = computed(() => connection.pendingError);
 const currentAddress = computed(() => connection.currentAddress);
@@ -39,6 +41,9 @@ const options = computed(() =>
 );
 
 const onUpdateValue = (value: string) => {
+  // since there are two copies of the same option,
+  // as select also add the entered value to the options
+  key.value++;
   connection.connect(value);
 };
 

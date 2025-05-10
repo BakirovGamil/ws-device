@@ -116,7 +116,6 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
   }
 
   private onError(ev: Event) {
-    this.cleanupState();
     this.error.value = new Error("Socket error");
     this.emit("error", ev);
   }
