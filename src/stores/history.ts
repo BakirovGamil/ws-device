@@ -9,10 +9,12 @@ export const useHistoryStore = defineStore("history", () => {
   const recentAddress = ref(savedAddresses.recentAddress);
   const addressHistory = ref<string[]>(savedAddresses.addressHistory);
 
-  const promote = (address: string) => {
+  const promoteRecent = (address: string) => {
     recentAddress.value = address;
     storage.saveRecentAddress(recentAddress.value);
+  };
 
+  const promote = (address: string) => {
     if (!addressHistory.value.includes(address)) {
       addAddress(address);
     } else {
@@ -47,6 +49,7 @@ export const useHistoryStore = defineStore("history", () => {
   return {
     recentAddress,
     addressHistory,
+    promoteRecent,
     promote,
     removeAddress,
     clearAddressHistory,

@@ -8,6 +8,7 @@ import { getPageByDeviceType } from "@/utils.ts";
 import { navigationService } from "@/classes/navigation-service.ts";
 import { CONFIG_MESSAGE_DEADLINE } from "@/defaults.ts";
 import type { StopListen } from "@/classes/event-emitter.ts";
+import { useLocalStorage } from "@vueuse/core";
 
 export const useConnectionStore = defineStore("connection", () => {
   const history = useHistoryStore();
@@ -16,6 +17,8 @@ export const useConnectionStore = defineStore("connection", () => {
   let stopListenConfig: StopListen | null = null;
   let stopListenOpen: StopListen | null = null;
   let stopListenError: StopListen | null = null;
+
+  const shouldConnectToRecent = useLocalStorage("shouldConnectToRecent", false);
 
   const currentConnection = shallowRef<SocketService | null>(null);
   const pendingConnection = shallowRef<SocketService | null>(null);
@@ -32,7 +35,7 @@ export const useConnectionStore = defineStore("connection", () => {
   const config = ref<Config | null>(null);
   const deviceType = computed(() => (isConnected.value ? config.value?.deviceType || null : null));
 
-  const connect = async (address: string) => {
+  const connect = (address: string) => {
     address = address.trim();
     if (!address) {
       return;
@@ -41,6 +44,14 @@ export const useConnectionStore = defineStore("connection", () => {
     history.promote(address);
     cancelConnection();
     createConnection(address);
+  };
+
+  const tryConnectToRecent = () => {
+    if (!shouldConnectToRecent.value || !history.recentAddress) {
+      return;
+    }
+
+    connect(history.recentAddress);
   };
 
   const createConnection = (address: string) => {
@@ -86,6 +97,8 @@ export const useConnectionStore = defineStore("connection", () => {
   };
 
   const commitConnection = (socket: SocketService) => {
+    shouldConnectToRecent.value = true;
+    history.promoteRecent(socket.address);
     disconnectCurrent();
     pendingConnection.value = null;
     currentConnection.value = socket;
@@ -100,6 +113,7 @@ export const useConnectionStore = defineStore("connection", () => {
   };
 
   const disconnect = () => {
+    shouldConnectToRecent.value = false;
     cancelConnection();
     disconnectCurrent();
     navigationService.navigateTo(PageName.Connect);
@@ -132,6 +146,7 @@ export const useConnectionStore = defineStore("connection", () => {
     currentError,
     pendingAddress,
     pendingError,
+    tryConnectToRecent,
     connect,
     disconnect,
     cancelConnection,
