@@ -1,7 +1,7 @@
 <template>
   <n-input-group>
     <n-select v-model:value="value" :placeholder="state" :options="options" filterable tag clearable />
-    <n-button @click="setState"> Состояние</n-button>
+    <n-button class="w-[100px]" @click="setState"> Состояние</n-button>
   </n-input-group>
 </template>
 

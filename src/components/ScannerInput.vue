@@ -1,22 +1,21 @@
 <template>
-  <n-dynamic-input v-model:value="cardData" :on-create="createEmpty">
-    <template #create-button-default>Добавить карту</template>
+  <n-dynamic-input v-model:value="scannerData" :on-create="createEmpty">
+    <template #create-button-default>Добавить сканер</template>
     <template #default="{ value }">
       <div class="flex items-center w-full">
-        <n-input-number title="Адрес" class="mr-3 w-40" v-model:value="value.address" min="0" placeholder="Адрес" />
         <n-auto-complete
-          title="Код карты"
+          title="Код сканера"
           v-model:value="value.code"
           :options="getAutoCompleteOptions(value.code)"
           :get-show="getShow"
           type="text"
-          placeholder="Код карты"
+          placeholder="Код сканера"
           @blur="onBlur"
           clearable
         >
           <template #prefix>
             <n-icon>
-              <credit-card-filled />
+              <qr-code-round />
             </n-icon>
           </template>
         </n-auto-complete>
@@ -26,8 +25,8 @@
       <n-button-group class="ml-4 mr-2">
         <n-button
           class="height-[34px] px-2"
-          title="Добавить карту"
-          :disabled="cardData.length >= MAX_CARD_COUNT"
+          title="Добавить сканер"
+          :disabled="scannerData.length >= MAX_CARD_COUNT"
           @click="() => create(index)"
           round
         >
@@ -37,8 +36,8 @@
         </n-button>
         <n-button
           class="height-[34px] px-2"
-          title="Удалить карту"
-          :disabled="cardData.length <= MIN_CARD_COUNT"
+          title="Удалить сканер"
+          :disabled="scannerData.length <= MIN_CARD_COUNT"
           @click="() => remove(index)"
           round
         >
@@ -49,8 +48,8 @@
       </n-button-group>
       <n-button
         class="height-[34px]"
-        title="Отправить карту"
-        :disabled="!value.code || isNaN(value.address)"
+        title="Отправить сканер"
+        :disabled="!value.code"
         @click="() => onSend(value)"
         round
       >
@@ -65,29 +64,28 @@
 </template>
 
 <script setup lang="ts">
-import { CreditCardFilled, PlusRound, RemoveRound, SendRound } from "@vicons/material";
-import { NAutoComplete, NButton, NButtonGroup, NDynamicInput, NIcon, NInputNumber } from "naive-ui";
+import { QrCodeRound, PlusRound, RemoveRound, SendRound } from "@vicons/material";
+import { NAutoComplete, NButton, NButtonGroup, NDynamicInput, NIcon } from "naive-ui";
 import { MAX_CARD_COUNT, MAX_CARD_HISTORY, MIN_CARD_COUNT } from "@/defaults.ts";
-import type { CardData } from "@/types.ts";
+import type { CardData, ScannerData } from "@/types.ts";
 import { useLocalStorage } from "@vueuse/core";
 import { computed } from "vue";
 
 interface Emits {
-  (e: "send:card", data: CardData): void;
+  (e: "send:scanner", data: ScannerData): void;
 }
 
 const emit = defineEmits<Emits>();
 
-const createEmpty = (): CardData => {
+const createEmpty = (): ScannerData => {
   return {
-    address: 0,
     code: "",
   };
 };
 
-const cardData = useLocalStorage<CardData[]>("cardData", [createEmpty()]);
-const history = useLocalStorage<string[]>("cardHistory", []);
-const codes = computed(() => cardData.value.map((card) => card.code));
+const scannerData = useLocalStorage<ScannerData[]>("scannerData", [createEmpty()]);
+const history = useLocalStorage<string[]>("scannerHistory", []);
+const codes = computed(() => scannerData.value.map((card) => card.code));
 
 const historyOptions = computed(() =>
   history.value.map((code) => ({
@@ -130,12 +128,10 @@ const updateHistory = (codes: string[]) => {
 };
 
 const onSend = (data: CardData) => {
-  emit("send:card", data);
+  emit("send:scanner", data);
 };
 
 const onBlur = () => {
   updateHistory(codes.value);
 };
 </script>
-
-<style scoped></style>

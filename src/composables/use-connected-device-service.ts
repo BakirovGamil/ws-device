@@ -19,9 +19,9 @@ export function useConnectedDeviceService() {
       // we explicitly set both states to ensure
       // they are updated correctly
       clearTimeout(timeout);
-      service.setInput(0, true);
+      service.setSingleInput(0, true);
       timeout = setTimeout(() => {
-        service.setInput(0, false);
+        service.setSingleInput(0, false);
       }, 500);
     },
     { immediate: true },

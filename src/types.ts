@@ -27,6 +27,10 @@ export type DeviceServiceEvents = {
   log: Log;
 };
 
+export type ScannerData = {
+  code: string;
+}
+
 export type CardData = {
   address: number;
   code: string;

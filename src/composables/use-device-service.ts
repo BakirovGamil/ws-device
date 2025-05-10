@@ -1,7 +1,7 @@
 import { readonly, ref, shallowRef } from "vue";
 import { createEmptyInputsRelays } from "@/utils";
 import { EventEmitter, SocketService } from "@/classes";
-import type { CardData, DeviceServiceEvents, Inputs, Log, LogLevel, MessageData, Relays } from "@/types";
+import type { CardData, DeviceServiceEvents, Inputs, Log, LogLevel, MessageData, Relays, ScannerData } from "@/types";
 
 export function useDeviceService() {
   const state = ref("Неизвестный статус");
@@ -115,11 +115,18 @@ export function useDeviceService() {
     logs.value = [];
   };
 
-  const setInput = (input: number, enabled: boolean) => {
+  const setSingleInput = (input: number, enabled: boolean) => {
     send({
       type: "mock.setSingleInput",
       input: input.toString(),
       value: enabled ? "on" : "off",
+    });
+  };
+
+  const setInputs = (inputs: number) => {
+    send({
+      type: "mock.setInputs",
+      inputs: inputs.toString(),
     });
   };
 
@@ -137,6 +144,13 @@ export function useDeviceService() {
     });
   };
 
+  const setReverse = () => {
+    send({
+      type: "mock.SetReverse",
+      reverse: "true",
+    });
+  };
+
   const sendCard = (cardData: CardData) => {
     const { code, address } = cardData;
 
@@ -145,6 +159,15 @@ export function useDeviceService() {
       type: "mock.setCardID",
       "card-id": code,
       "card-addr": address.toString(),
+    });
+  };
+
+  const sendScanner = (scannerData: ScannerData) => {
+    const { code } = scannerData;
+
+    send({
+      type: "mock.codeRead",
+      code: code,
     });
   };
 
@@ -157,10 +180,13 @@ export function useDeviceService() {
     clearLogs,
     setSocket,
     send,
-    setInput,
+    setSingleInput,
+    setInputs,
     setState,
     setError,
+    setReverse,
     sendCard,
+    sendScanner,
 
     on: emitter.on.bind(emitter),
     off: emitter.off.bind(emitter),

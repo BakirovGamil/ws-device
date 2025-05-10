@@ -1,7 +1,7 @@
 <template>
   <n-input-group>
     <n-input v-model:value="value" placeholder="Введите ошибку" clearable />
-    <n-button @click="setError"> Ошибка</n-button>
+    <n-button class="w-[100px]" @click="setError"> Ошибка</n-button>
   </n-input-group>
 </template>
 
