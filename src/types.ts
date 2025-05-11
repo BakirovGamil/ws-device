@@ -29,7 +29,7 @@ export type DeviceServiceEvents = {
 
 export type ScannerData = {
   code: string;
-}
+};
 
 export type CardData = {
   address: number;
@@ -43,3 +43,25 @@ export type Log = {
   level: LogLevel;
   data: Record<string, unknown>;
 };
+
+export interface RawTicket {
+  "ticket-header": string;
+  "ticket-contact": string;
+  "ticket-parking": string;
+  "ticket-time": string;
+  "ticket-plate-num": string;
+  "ticket-rate": string;
+  "ticket-barcode": string;
+  "ticket-deviceID": string;
+}
+
+export interface Ticket {
+  header: string;
+  contact: string;
+  parkingHours: string;
+  plateNumber?: string;
+  time: string;
+  deviceID: string;
+  rate?: string;
+  barcode?: string;
+}

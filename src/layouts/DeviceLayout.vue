@@ -8,22 +8,28 @@
     </header>
     <main class="max-w-screen-xl mx-auto space-y-4 h-full p-4 sm:pt-10 bg-zinc-900">
       <div class="flex gap-4">
-        <InputsRelays :inputs="inputs" :relays="relays" @set:input="onSetSingleInputs" />
+        <InputsRelays class="self-start" :inputs="inputs" :relays="relays" @set:input="onSetSingleInputs" />
         <div class="bg-zinc-800 rounded-lg shadow-lg overflow-hidden p-4 flex-1">
           <slot name="controls" />
         </div>
       </div>
       <div class="grid xl:grid-cols-4 gap-4 bg-zinc-800 rounded-lg shadow-lg overflow-hidden p-4">
-        <div class="xl:col-span-3 grid md:grid-cols-2 gap-4">
-          <StateInput :state="state" @set:state="onSetState" />
-          <ErrorInput @set:error="onSetError" />
-          <CardInput @send:card="onSendCard" />
-          <ScannerInput @send:scanner="onSendScanner" />
+        <div class="xl:col-span-3">
+          <div class="grid md:grid-cols-2 gap-4">
+            <StateInput :state="state" @set:state="onSetState" />
+            <ErrorInput @set:error="onSetError" />
+            <CardInput @send:card="onSendCard" />
+            <ScannerInput @send:scanner="onSendScanner" />
+          </div>
         </div>
         <div class="flex xl:flex-col gap-4">
           <InputsInput @set:inputs="onSetInputs" />
-          <n-button @click="onSetReverse"> Reverse</n-button>
+          <n-button @click="onSetReverse"> Реверс</n-button>
+          <ShutdownButton @shutdown="emit('shutdown')" />
         </div>
+      </div>
+      <div class="flex gap-4">
+        <ParkingTicket v-model:ticket="ticket" />
       </div>
       <DeviceLogs :logs="logs" @clear="onClearLogs" />
     </main>
@@ -31,8 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import type { CardData, Relays, ScannerData, SetInputEvent } from "@/types.ts";
+import type { CardData, Inputs, Relays, ScannerData, SetInputEvent, Ticket } from "@/types.ts";
 import { NButton } from "naive-ui";
+import { useVModel } from "@vueuse/core";
 import ConnectionSelector from "@/components/ConnectionSelector.vue";
 import DeviceState from "@/components/DeviceState.vue";
 import DeviceLogs from "@/components/DeviceLogs.vue";
@@ -42,6 +49,8 @@ import CardInput from "@/components/CardInput.vue";
 import ScannerInput from "@/components/ScannerInput.vue";
 import InputsInput from "@/components/InputsInput.vue";
 import InputsRelays from "@/components/InputsRelays.vue";
+import ParkingTicket from "@/components/ParkingTicket.vue";
+import ShutdownButton from "@/components/ShutdownButton.vue";
 
 interface Emits {
   (e: "set:state", state: string): void;
@@ -54,9 +63,13 @@ interface Emits {
 
   (e: "set:reverse"): void;
 
+  (e: "update:ticket", ticket: Ticket | null): void;
+
   (e: "send:card", data: CardData): void;
 
   (e: "send:scanner", data: ScannerData): void;
+
+  (e: "shutdown"): void;
 
   (e: "clear:logs"): void;
 }
@@ -66,10 +79,13 @@ interface Props {
   logs: string[];
   inputs: Inputs;
   relays: Relays;
+  ticket: Ticket | null;
 }
 
 const emit = defineEmits<Emits>();
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const ticket = useVModel(props, "ticket", emit);
 
 const onSetState = (state: string) => {
   emit("set:state", state);

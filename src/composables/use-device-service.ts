@@ -1,13 +1,24 @@
 import { readonly, ref, shallowRef } from "vue";
-import { createEmptyInputsRelays } from "@/utils";
+import { createEmptyInputsRelays, ticketFromRaw } from "@/utils";
 import { EventEmitter, SocketService } from "@/classes";
-import type { CardData, DeviceServiceEvents, Inputs, Log, LogLevel, MessageData, Relays, ScannerData } from "@/types";
+import type {
+  CardData,
+  DeviceServiceEvents,
+  Inputs,
+  Log,
+  LogLevel,
+  MessageData, RawTicket,
+  Relays,
+  ScannerData,
+  Ticket,
+} from "@/types";
 
 export function useDeviceService() {
   const state = ref("Неизвестный статус");
   const logs = ref<Log[]>([]);
   const inputs = ref(createEmptyInputsRelays("inputs"));
   const relays = ref(createEmptyInputsRelays("relays"));
+  const ticket = ref<Ticket | null>(null);
 
   const socket = shallowRef<SocketService | null>(null);
   const emitter = new EventEmitter<DeviceServiceEvents>();
@@ -17,6 +28,7 @@ export function useDeviceService() {
     logs.value = [];
     inputs.value = createEmptyInputsRelays("inputs");
     relays.value = createEmptyInputsRelays("relays");
+    ticket.value = null;
   };
 
   const setSocket = (newSocket: SocketService | null) => {
@@ -102,6 +114,13 @@ export function useDeviceService() {
         state.value = value as string;
         emitter.emit("newState", value as string);
         break;
+      case "debugPrintTicket":
+        const ticketData = ticketFromRaw(data as unknown as RawTicket);
+        ticket.value = ticketData;
+        break;
+      case "debugRetractPaper":
+        ticket.value = null;
+        break;
     }
   };
 
@@ -171,11 +190,19 @@ export function useDeviceService() {
     });
   };
 
+  const shutDown = () => {
+    send({
+      type: "mock.Exit",
+      exitTime: "now",
+    });
+  };
+
   return {
     state: readonly(state),
     logs: readonly(logs),
     inputs: readonly(inputs),
     relays: readonly(relays),
+    ticket: ticket,
 
     clearLogs,
     setSocket,
@@ -187,6 +214,7 @@ export function useDeviceService() {
     setReverse,
     sendCard,
     sendScanner,
+    shutDown,
 
     on: emitter.on.bind(emitter),
     off: emitter.off.bind(emitter),

@@ -1,10 +1,11 @@
 <template>
   <n-input-group>
-    <n-input-group-label class="flex items-center justify-center">
+    <n-input-group-label v-if="!currentAddress" class="flex items-center justify-center">
       <n-icon>
         <lan-round />
       </n-icon>
     </n-input-group-label>
+    <CopyButton v-else :text="currentAddress" :copy-icon="LanRound" />
     <n-select
       :key="key"
       :value="currentAddress"
@@ -20,9 +21,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { LanRound } from "@vicons/material";
-import { NIcon, NInputGroup, NInputGroupLabel, NSelect, useLoadingBar } from "naive-ui";
+import { NInputGroup, NSelect, useLoadingBar, NInputGroupLabel, NIcon } from "naive-ui";
 import { useConnectionStore } from "@/stores/connection.ts";
 import { useHistoryStore } from "@/stores/history.ts";
+import CopyButton from "@/components/CopyButton.vue";
 
 const connection = useConnectionStore();
 const history = useHistoryStore();

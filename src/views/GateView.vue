@@ -4,6 +4,7 @@
     :inputs="inputs"
     :relays="relays"
     :state="state"
+    v-model:ticket="ticket"
     @set:state="setState"
     @set:error="onSetError"
     @set:inputs="onSetInputs"
@@ -11,20 +12,38 @@
     @set:reverse="onSetReverse"
     @send:card="onSendCard"
     @send:scanner="onSendScanner"
+    @shutdown="shutDown"
     @clear:logs="clearLogs"
-  />
+  >
+    <template #controls>
+      <GateControls
+        v-model:first-loop="firstLoop"
+        v-model:second-loop="secondLoop"
+        v-model:ticket-print="ticketPrint"
+        v-model:voice-call="voiceCall"
+        @pickup-ticket="pickupTicket"
+      />
+    </template>
+  </DeviceLayout>
 </template>
 
 <script setup lang="ts">
 import type { CardData, ScannerData, SetInputEvent } from "@/types.ts";
 import DeviceLayout from "@/layouts/DeviceLayout.vue";
 import { useGateService } from "@/composables";
+import GateControls from "@/components/GateControls.vue";
 
 const {
   state,
   inputs,
   relays,
   logs,
+  ticket,
+  firstLoop,
+  secondLoop,
+  ticketPrint,
+  voiceCall,
+  pickupTicket,
   setSingleInput,
   setInputs,
   setState,
@@ -32,6 +51,7 @@ const {
   setReverse,
   sendCard,
   sendScanner,
+  shutDown,
   clearLogs,
 } = useGateService();
 

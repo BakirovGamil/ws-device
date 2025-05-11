@@ -1,6 +1,6 @@
 import { PageName } from "@/router";
 import { INPUTS_RELAYS_COUNT } from "@/defaults.ts";
-import type { Bit, Inputs, Relays } from "@/types.ts";
+import type { Bit, Inputs, RawTicket, Relays, Ticket } from "@/types.ts";
 
 export function createEmptyInputsRelays(type: "inputs"): Inputs;
 export function createEmptyInputsRelays(type: "relays"): Relays;
@@ -39,5 +39,18 @@ export function getPageByDeviceType(type: unknown): PageName {
     DEFAULT: PageName.Connect,
   };
 
-  return DEVICE_ROUTES[type] || DEVICE_ROUTES.DEFAULT;
+  return DEVICE_ROUTES[type as never] || DEVICE_ROUTES.DEFAULT;
+}
+
+export function ticketFromRaw(rawTicket: RawTicket): Ticket {
+  return {
+    header: rawTicket["ticket-header"],
+    contact: rawTicket["ticket-contact"],
+    parkingHours: rawTicket["ticket-parking"],
+    time: rawTicket["ticket-time"],
+    plateNumber: rawTicket["ticket-plate-num"],
+    rate: rawTicket["ticket-rate"],
+    barcode: rawTicket["ticket-barcode"],
+    deviceID: rawTicket["ticket-deviceID"],
+  };
 }

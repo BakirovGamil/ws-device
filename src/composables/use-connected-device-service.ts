@@ -2,7 +2,7 @@ import { onUnmounted, watch } from "vue";
 import { useDeviceService } from "./use-device-service.ts";
 import { useConnectionStore } from "@/stores/connection";
 
-export function useConnectedDeviceService() {
+export function useConnectedDeviceService(onSocketUpdated?: () => void) {
   const service = useDeviceService();
   const connection = useConnectionStore();
   let timeout: ReturnType<typeof setTimeout>;
@@ -10,6 +10,7 @@ export function useConnectedDeviceService() {
   watch(
     () => connection.currentConnection,
     (socket) => {
+      onSocketUpdated?.();
       service.setSocket(socket);
       socket?.disableQueue();
 
@@ -29,6 +30,7 @@ export function useConnectedDeviceService() {
 
   onUnmounted(() => {
     clearTimeout(timeout);
+    onSocketUpdated?.();
     service.setSocket(null);
   });
 

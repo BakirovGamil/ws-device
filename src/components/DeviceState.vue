@@ -40,6 +40,10 @@ const type = computed(() => {
     return "warning";
   }
 
+  if(state.value === "waiting") {
+    return "info";
+  }
+
   if(state.value === "Неизвестный статус") {
     return "default";
   }
