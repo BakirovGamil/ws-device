@@ -1,3 +1,5 @@
+import containerQueriesPlugin from "@tailwindcss/container-queries";
+
 /** @type {import("tailwindcss").Config} */
 export default {
   content: ["index.html", "./src/**/*.{js,vue,ts}"],
@@ -8,5 +10,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [containerQueriesPlugin],
 };

@@ -46,7 +46,7 @@
         </div>
       </div>
       <div v-else>
-        <n-empty class="py-4" />
+        <n-empty class="py-16" />
       </div>
     </div>
   </div>
@@ -101,7 +101,7 @@ const clearTicket = () => {
 
 <style scoped>
 .ticket-viewer {
-  @apply h-full flex flex-col bg-zinc-800 rounded-lg shadow-lg overflow-hidden w-full sm:w-96;
+  @apply h-full flex flex-col bg-zinc-800 rounded-lg shadow-lg overflow-hidden w-full min-w-80;
 }
 
 .header-header {

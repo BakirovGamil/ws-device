@@ -2,6 +2,7 @@
   <div class="inline-flex flex-col gap-1 shadow-lg rounded-lg bg-zinc-800 divide-y divide-zinc-700">
     <BitGroup
       v-for="group in groups"
+      :class="contentClass"
       :key="group.key"
       :title="group.title"
       :bits="toValue(group.value)"
@@ -24,6 +25,7 @@ interface Emits {
 interface Props {
   inputs: Inputs;
   relays: Relays;
+  contentClass?: unknown;
 }
 
 const emit = defineEmits<Emits>();

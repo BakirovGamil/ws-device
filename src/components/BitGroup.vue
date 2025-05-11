@@ -1,6 +1,6 @@
 <template>
-  <div class="pt-1 px-2 pb-2">
-    <div class="text-neutral-200 text-center mb-1">{{ title }}</div>
+  <div class="pt-1 px-2 pb-2  text-center">
+    <div class="text-neutral-200 mb-1">{{ title }}</div>
     <div
       class="flex flex-row-reverse gap-1"
       @keydown.left="moveFocus(1)"

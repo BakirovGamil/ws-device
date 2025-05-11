@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col gap-2">
-    <div class="grid sm:grid-cols-3 md:grid-cols-4 gap-2 xl:max-w-[600px]">
+  <div class="@container flex flex-col gap-2">
+    <div class="grid gap-2 @[300px]:grid-cols-2 @[425px]:grid-cols-3 @[560px]:grid-cols-4 @[600px]:max-w-[700px]">
       <template v-for="btn in buttons" :key="btn.key">
         <HotkeyButton v-if="btn.model" v-model:toggle-value="btn.model.value" :hotkey="btn.hotkey">
           {{ btn.label }}
@@ -106,7 +106,7 @@ const buttons = computed(() => [
   },
 ]);
 
-const recognizePlateNumber = (plateNumber: number) => {
+const recognizePlateNumber = (plateNumber: string) => {
   emit("recognizePlateNumber", plateNumber);
 };
 </script>
