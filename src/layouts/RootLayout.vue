@@ -1,7 +1,6 @@
 <template>
   <RouterView />
   <DisconnectButton />
-  <n-back-top :right="100" />
 </template>
 
 <script setup lang="ts">

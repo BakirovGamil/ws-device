@@ -1,14 +1,15 @@
 <template>
-  <div class="log-viewer">
-    <div class="log-header">
-      <div class="log-title">
+  <div class="h-[calc(100dvh-100px)] flex flex-col bg-zinc-800 rounded-lg shadow-lg overflow-hidden">
+    <div
+      class="flex items-center justify-between p-4 border-b border-zinc-700 bg-[rgba(39,39,42,0.7)] backdrop-blur-sm"
+    >
+      <div class="flex items-center gap-2 text-neutral-200 font-medium">
         <n-icon size="20" class="text-blue-400">
           <code-round />
         </n-icon>
         <h3>Логи</h3>
       </div>
-      <div class="log-controls">
-
+      <div class="flex gap-4">
         <n-button title="Очистить" class="h-8 px-2" size="small" @click="clearLogs">
           <template #icon>
             <n-icon>
@@ -19,38 +20,44 @@
       </div>
     </div>
 
-    <div class="log-filters p-4">
-      <n-input class="!w-72 flex-none" v-model:value="searchText" placeholder="Поиск" clearable />
+    <div class="flex flex-col items-start sm:flex-row sm:items-center gap-4 p-4">
+      <n-input class="md:!w-72" v-model:value="searchText" placeholder="Поиск" clearable />
       <n-select
-        class="w-72 flex-none"
+        class="md:w-72"
         placeholder="Уровень"
         v-model:value="levelFilter"
         :options="levelOptions"
         multiple
         clearable
       />
-      <n-switch title="Отображать исходящие" v-model:value="showOutgoing">
-        <template #icon>
-          <LogTypeIcon class="text-xl" type="outgoing" />
-        </template>
-      </n-switch>
-      <n-switch title="Отображать входящие" v-model:value="showIncoming">
-        <template #icon>
-          <LogTypeIcon class="text-xl" type="incoming" />
-        </template>
-      </n-switch>
+      <div class="flex gap-4 items-center">
+        <n-switch title="Отображать исходящие" v-model:value="showOutgoing">
+          <template #icon>
+            <LogTypeIcon class="text-xl" type="outgoing" />
+          </template>
+        </n-switch>
+        <n-switch title="Отображать входящие" v-model:value="showIncoming">
+          <template #icon>
+            <LogTypeIcon class="text-xl" type="incoming" />
+          </template>
+        </n-switch>
+      </div>
     </div>
 
-    <n-scrollbar class="log-container" content-class="log-list">
+    <n-scrollbar class="h-full" content-class="p-4 pt-0 space-y-3">
       <template v-if="!postFilteredLogs.length">
         <n-empty class="py-12" />
       </template>
-      <div v-for="(log, index) in postFilteredLogs" :key="index" class="log-entry">
+      <div
+        v-for="(log, index) in postFilteredLogs"
+        :key="index"
+        class="p-3 rounded-lg bg-[rgba(63,63,70,0.3)] hover:bg-zinc-700 transition-all duration-200 ease-in-out"
+      >
         <div class="flex gap-2 mb-2 items-center">
           <LogTypeTag :type="log.type" />
           <LogLevelTag :level="log.level" />
         </div>
-        <n-code :code="log.data" language="json" :hljs="hljs" class="log-content" word-wrap />
+        <n-code :code="log.data" language="json" :hljs="hljs" class="bg-transparent p-0 !important" word-wrap />
       </div>
     </n-scrollbar>
   </div>
@@ -147,49 +154,3 @@ const formatLog = (log: Log) => {
   };
 };
 </script>
-
-<style scoped>
-.log-viewer {
-  @apply h-full flex flex-col bg-zinc-800 rounded-lg shadow-lg overflow-hidden;
-}
-
-.log-header {
-  @apply flex items-center justify-between p-4 border-b border-zinc-700;
-  background: rgba(39, 39, 42, 0.7);
-  backdrop-filter: blur(4px);
-}
-
-.log-filters {
-  @apply flex items-center gap-4 translate-y-[1px];
-}
-
-.log-title {
-  @apply flex items-center gap-2 text-neutral-200 font-medium;
-}
-
-.log-controls {
-  @apply flex gap-4;
-}
-
-:deep(.log-container) {
-  @apply h-full;
-}
-
-:deep(.log-list) {
-  @apply p-4 pt-0 space-y-3;
-}
-
-.log-entry {
-  @apply p-3 rounded-lg;
-  background: rgba(63, 63, 70, 0.3);
-  transition: all 0.2s ease;
-}
-
-.log-entry:hover {
-  @apply bg-zinc-700;
-}
-
-.log-content {
-  @apply bg-transparent p-0 !important;
-}
-</style>
