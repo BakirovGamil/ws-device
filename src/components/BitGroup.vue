@@ -19,7 +19,6 @@
         }"
         :disabled="!editable"
         @click="emit('update:bit', { index, enabled: !bit })"
-        @dblclick="emit('update:bit', { index, enabled: !!bit })"
         @focus="currentFocusIndex = index"
       />
     </div>
