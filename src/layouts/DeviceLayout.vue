@@ -31,6 +31,7 @@
           </div>
           <ParkingTicket class="flex-shrink-[3]" v-model:ticket="ticket" />
         </div>
+        <DeviceWindow :address="connection.currentAddress" />
         <DeviceLogs :logs="logs" @clear="onClearLogs" />
       </div>
     </n-scrollbar>
@@ -52,6 +53,8 @@ import InputsInput from "@/components/InputsInput.vue";
 import InputsRelays from "@/components/InputsRelays.vue";
 import ParkingTicket from "@/components/ParkingTicket.vue";
 import ShutdownButton from "@/components/ShutdownButton.vue";
+import DeviceWindow from "@/components/DeviceWindow.vue";
+import { useConnectionStore } from "@/stores/connection.ts";
 
 interface Emits {
   (e: "set:state", state: string): void;
@@ -76,6 +79,7 @@ interface Emits {
 }
 
 interface Props {
+  address: string;
   state: string;
   logs: string[];
   inputs: Inputs;
@@ -86,6 +90,7 @@ interface Props {
 const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 
+const connection = useConnectionStore();
 const ticket = useVModel(props, "ticket", emit);
 
 const onSetState = (state: string) => {
