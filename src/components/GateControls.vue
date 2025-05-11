@@ -15,6 +15,7 @@
       >
         Вызов
       </HotkeyButton>
+      <PlateNumberInput @recognize-plate-number="recognizePlateNumber" />
     </div>
   </div>
 </template>
@@ -23,6 +24,7 @@
 import { computed, type Ref } from "vue";
 import { useVModel } from "@vueuse/core";
 import HotkeyButton from "@/components/HotkeyButton.vue";
+import PlateNumberInput from "@/components/PlateNumberInput.vue";
 
 interface Emits {
   (e: "update:firstLoop", enabled: boolean): void;
@@ -34,6 +36,8 @@ interface Emits {
   (e: "update:voiceCall", enabled: boolean): void;
 
   (e: "pickupTicket"): void;
+
+  (e: "recognizePlateNumber", plateNumber: string): void;
 }
 
 interface Props {
@@ -101,4 +105,8 @@ const buttons = computed(() => [
     hotkey: hotkeyActions.secondLoop.hotkey,
   },
 ]);
+
+const recognizePlateNumber = (plateNumber: number) => {
+  emit("recognizePlateNumber", plateNumber);
+};
 </script>

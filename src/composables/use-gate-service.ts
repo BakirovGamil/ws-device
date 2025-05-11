@@ -56,12 +56,17 @@ export const useGateService = () => {
     service.send({ type: "mock.ticketPickup", "ticket-pickup": "done" });
   };
 
+  const recognizePlateNumber = (plateNumber: string) => {
+    service.send({ type: "mock.setPlateNum", value: plateNumber });
+  };
+
   return {
     firstLoop,
     secondLoop,
     ticketPrint,
     voiceCall,
     pickupTicket,
+    recognizePlateNumber,
     ...service,
   };
 };

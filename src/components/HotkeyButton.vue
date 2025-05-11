@@ -1,10 +1,16 @@
 <template>
   <n-tooltip trigger="hover" placement="top" :show-arrow="false">
     <template #trigger>
-      <ToggleButton v-if="toggleValue !== undefined" v-model:active="toggleValue">
+      <ToggleButton v-if="toggleValue !== undefined" v-model:active="toggleValue" :disabled="disabled">
+        <template #icon>
+          <slot name="icon" />
+        </template>
         <slot />
       </ToggleButton>
-      <n-button tertiary v-else :active="false" @click="onClick">
+      <n-button tertiary v-else :disabled="disabled" @click="onClick">
+        <template #icon>
+          <slot name="icon" />
+        </template>
         <slot />
       </n-button>
     </template>
@@ -26,6 +32,7 @@ interface Props {
   hotkey: string;
   toggleValue?: boolean;
   action?: () => void;
+  disabled?: boolean;
 }
 
 const emit = defineEmits<Emits>();
@@ -44,6 +51,10 @@ const formattedHotkey = computed(() => {
 });
 
 whenever(hotKeyPressed, () => {
+  if (props.disabled) {
+    return;
+  }
+
   if (toggleValue.value !== undefined) {
     toggleValue.value = !toggleValue.value;
   } else if (props.action) {

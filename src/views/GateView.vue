@@ -21,6 +21,7 @@
         v-model:second-loop="secondLoop"
         v-model:ticket-print="ticketPrint"
         v-model:voice-call="voiceCall"
+        @recognize-plate-number="recognizePlateNumber"
         @pickup-ticket="pickupTicket"
       />
     </template>
@@ -44,6 +45,7 @@ const {
   ticketPrint,
   voiceCall,
   pickupTicket,
+  recognizePlateNumber,
   setSingleInput,
   setInputs,
   setState,
