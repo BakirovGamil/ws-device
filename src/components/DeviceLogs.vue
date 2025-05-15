@@ -51,11 +51,14 @@
       <div
         v-for="(log, index) in postFilteredLogs"
         :key="index"
-        class="p-3 rounded-lg bg-[rgba(63,63,70,0.3)] hover:bg-zinc-700 transition-all duration-200 ease-in-out"
+        class="p-3 rounded-lg bg-[rgba(63,63,70,0.3)] group hover:bg-zinc-700 transition-all duration-200 ease-in-out"
       >
-        <div class="flex gap-2 mb-2 items-center">
-          <LogTypeTag :type="log.type" />
-          <LogLevelTag :level="log.level" />
+        <div class="flex gap-2 justify-between">
+          <div class="flex gap-2 mb-2 items-center">
+            <LogTypeTag :type="log.type" />
+            <LogLevelTag :level="log.level" />
+          </div>
+          <CopyButton class="invisible group-hover:visible size-8 p-0" :text="log.data" />
         </div>
         <n-code :code="log.data" language="json" :hljs="hljs" class="bg-transparent p-0 !important" word-wrap />
       </div>
@@ -74,6 +77,7 @@ import type { Log, LogLevel } from "@/types.ts";
 import LogTypeIcon from "@/components/LogTypeIcon.vue";
 import LogTypeTag from "@/components/LogTypeTag.vue";
 import LogLevelTag from "@/components/LogLevelTag.vue";
+import CopyButton from "@/components/CopyButton.vue";
 
 hljs.registerLanguage("json", json);
 

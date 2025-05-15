@@ -1,5 +1,5 @@
 <template>
-  <n-button :disabled="copied" @click="handleCopy">
+  <n-button title="Скопировать" :disabled="copied" @click="handleCopy">
     <n-icon :component="copied ? successIcon : copyIcon" />
   </n-button>
 </template>
