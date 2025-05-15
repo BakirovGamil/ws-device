@@ -79,7 +79,6 @@ interface Emits {
 }
 
 interface Props {
-  address: string;
   state: string;
   logs: string[];
   inputs: Inputs;
