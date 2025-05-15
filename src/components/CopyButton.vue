@@ -48,7 +48,7 @@ const handleCopy = async () => {
 
 onBeforeUnmount(() => {
   if (timeoutId) {
-    clearTimeout(timeoutoutId);
+    clearTimeout(timeoutId);
   }
 });
 </script>
