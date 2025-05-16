@@ -11,7 +11,13 @@
       <div class="max-w-screen-xl mx-auto space-y-2 sm:space-y-4 h-full p-2 sm:p-4 sm:pt-10 bg-zinc-900">
         <div class="flex gap-2 sm:gap-4">
           <div class="bg-zinc-800 rounded-lg shadow-lg p-2 sm:p-4 pt-2 flex flex-col basis-64 gap-2">
-            <InputsRelays class="self-start shadow-none" content-class="!px-0 !text-left" :inputs="inputs" :relays="relays" @set:input="onSetSingleInputs" />
+            <InputsRelays
+              class="self-start shadow-none"
+              content-class="!px-0 !text-left"
+              :inputs="inputs"
+              :relays="relays"
+              @set:input="onSetSingleInputs"
+            />
             <InputsInput @set:inputs="onSetInputs" />
             <n-button @click="onSetReverse"> Реверс</n-button>
             <ShutdownButton @shutdown="emit('shutdown')" />
@@ -39,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CardData, Inputs, Relays, ScannerData, SetInputEvent, Ticket } from "@/types.ts";
+import type { CardData, Inputs, Log, Relays, ScannerData, SetInputEvent, Ticket } from "@/types.ts";
 import { NBackTop, NButton, NScrollbar } from "naive-ui";
 import { useVModel } from "@vueuse/core";
 import ConnectionSelector from "@/components/ConnectionSelector.vue";
@@ -80,7 +86,7 @@ interface Emits {
 
 interface Props {
   state: string;
-  logs: string[];
+  logs: Log[];
   inputs: Inputs;
   relays: Relays;
   ticket: Ticket | null;

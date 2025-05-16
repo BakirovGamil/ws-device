@@ -4,22 +4,19 @@
     <template #default="{ value }">
       <div class="flex items-center w-full">
         <n-input-number title="Адрес" class="mr-3 w-40" v-model:value="value.address" min="0" placeholder="Адрес" />
-        <n-auto-complete
-          title="Код карты"
+        <InputWithHistory
+          storage-key="cardHistory"
           v-model:value="value.code"
-          :options="getAutoCompleteOptions(value.code)"
-          :get-show="getShow"
-          type="text"
+          title="Код карты"
           placeholder="Код карты"
-          @blur="onBlur"
-          clearable
+          :max-history-items="MAX_CARD_HISTORY"
         >
           <template #prefix>
             <n-icon>
               <credit-card-filled />
             </n-icon>
           </template>
-        </n-auto-complete>
+        </InputWithHistory>
       </div>
     </template>
     <template #action="{ index, create, remove, value }">
@@ -66,11 +63,11 @@
 
 <script setup lang="ts">
 import { CreditCardFilled, PlusRound, RemoveRound, SendRound } from "@vicons/material";
-import { NAutoComplete, NButton, NButtonGroup, NDynamicInput, NIcon, NInputNumber } from "naive-ui";
+import { NButton, NButtonGroup, NDynamicInput, NIcon, NInputNumber } from "naive-ui";
 import { MAX_CARD_COUNT, MAX_CARD_HISTORY, MIN_CARD_COUNT } from "@/defaults.ts";
 import type { CardData } from "@/types.ts";
 import { useLocalStorage } from "@vueuse/core";
-import { computed } from "vue";
+import InputWithHistory from "@/components/InputWithHistory.vue";
 
 interface Emits {
   (e: "send:card", data: CardData): void;
@@ -86,55 +83,9 @@ const createEmpty = (): CardData => {
 };
 
 const cardData = useLocalStorage<CardData[]>("cardData", [createEmpty()]);
-const history = useLocalStorage<string[]>("cardHistory", []);
-const codes = computed(() => cardData.value.map((card) => card.code));
-
-const historyOptions = computed(() =>
-  history.value.map((code) => ({
-    label: code,
-    value: code,
-  })),
-);
-
-const getShow = () => true;
-
-const getAutoCompleteOptions = (code: string) => {
-  if (code === "") {
-    return historyOptions.value;
-  }
-
-  const filtered = historyOptions.value.filter((data) => data.value.includes(code));
-
-  return filtered.sort((a, b) => {
-    if (a.value === code) return -1;
-    if (b.value === code) return 1;
-    return 0;
-  });
-};
-
-const updateHistory = (codes: string[]) => {
-  codes.forEach((code) => {
-    if (!code.trim()) return;
-
-    const index = history.value.indexOf(code);
-    if (index > -1) {
-      history.value.splice(index, 1);
-      history.value.unshift(code);
-    } else {
-      history.value.unshift(code);
-      if (history.value.length > MAX_CARD_HISTORY) {
-        history.value.pop();
-      }
-    }
-  });
-};
 
 const onSend = (data: CardData) => {
   emit("send:card", data);
-};
-
-const onBlur = () => {
-  updateHistory(codes.value);
 };
 </script>
 
