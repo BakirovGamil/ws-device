@@ -1,14 +1,13 @@
 <template>
   <div class="w-full">
     <div class="w-full bg-zinc-800 rounded-lg shadow-lg mb-2">
-      <div
-        class="text-neutral-200 font-medium flex items-center gap-2 cursor-pointer p-4 select-none"
-        @click="isExpanded = !isExpanded"
-      >
-        <n-icon size="20" class="text-blue-400">
-          <desktop-windows-round />
-        </n-icon>
-        <h3>Экран</h3>
+      <div class="text-neutral-200 font-medium flex items-center gap-2  p-4 ">
+        <div class="flex items-center gap-2 cursor-pointer select-none" @click="isExpanded = !isExpanded">
+          <n-icon size="20" class="text-blue-400">
+            <desktop-windows-round />
+          </n-icon>
+          <h3>Экран</h3>
+        </div>
         <span v-if="isExpanded" class="font-normal text-xs text-zinc-400" title="Текущий адрес экрана">
           {{ address }}
         </span>
@@ -61,7 +60,7 @@
 import { ref } from "vue";
 import { NAlert, NButton, NCollapseTransition, NIcon, NInputGroup } from "naive-ui";
 import { useLocalStorage } from "@vueuse/core";
-import { DesktopWindowsRound, RefreshRound, LanguageRound } from "@vicons/material";
+import { DesktopWindowsRound, LanguageRound, RefreshRound } from "@vicons/material";
 import InputWithHistory from "@/components/InputWithHistory.vue";
 
 interface Props {
