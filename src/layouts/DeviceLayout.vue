@@ -59,7 +59,7 @@ import InputsInput from "@/components/InputsInput.vue";
 import InputsRelays from "@/components/InputsRelays.vue";
 import ParkingTicket from "@/components/ParkingTicket.vue";
 import ShutdownButton from "@/components/ShutdownButton.vue";
-import DeviceWindow from "@/components/DeviceWindow.vue";
+import DeviceWindow from "@/components/device-window/DeviceWindow.vue";
 import { useConnectionStore } from "@/stores/connection.ts";
 
 interface Emits {

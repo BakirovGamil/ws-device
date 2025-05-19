@@ -8,4 +8,13 @@ export const MIN_SCANNER_COUNT = 1;
 export const MAX_SCANNER_COUNT = 5;
 export const MAX_SCANNER_HISTORY = 10;
 export const CONFIG_MESSAGE_DEADLINE = 10_000;
-export const STATES = ["regular", "outOfService", "active", "obstacleBehindBarrier", "ticketPrint", "ticketPickUp", "waiting" ];
+export const STATES = [
+  "regular",
+  "outOfService",
+  "active",
+  "obstacleBehindBarrier",
+  "ticketPrint",
+  "ticketPickUp",
+  "waiting",
+];
+export const WINDOW_ALERT_MESSAGE = "Это не дублирование экрана, а отдельное окно";
