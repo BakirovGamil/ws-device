@@ -60,7 +60,7 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
   }
 
   send(data: string) {
-    if (this.socket) {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(data);
     }
   }
@@ -94,7 +94,7 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
     }
 
     this.cleanupSocketListeners(this.socket);
-    this.socket.close();
+    this.socket.close(1000);
     this.socket = null;
   }
 
@@ -156,14 +156,18 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
   }
 
   private onClose(ev: CloseEvent) {
+    console.log("CLOSE", ev);
     this.cleanupConnectionState();
     this.emit("close", ev);
+    if(ev.code !== 1000) {
+      this.reconnect();
+    }
   }
 
   private onError(ev: Event) {
+    console.log("ERROR", ev);
     this.error.value = new Error("Socket error");
     this.emit("error", ev);
-    this.reconnect();
   }
 
   private onMessage(ev: MessageEvent) {

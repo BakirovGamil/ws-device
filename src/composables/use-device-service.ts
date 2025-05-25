@@ -125,7 +125,11 @@ export function useDeviceService() {
   };
 
   const send = (data: Record<string, unknown>) => {
-    if (!socket.value) return;
+    if (!socket.value || !socket.value.isConnected.value) {
+      console.warn("cannot send");
+      return;
+    }
+
     logOutgoing(data);
     socket.value.send(JSON.stringify(data));
   };

@@ -2,12 +2,10 @@ import { computed, ref, shallowRef } from "vue";
 import { defineStore } from "pinia";
 import { PageName } from "@/router";
 import type { Config } from "@/types";
-import { SocketService } from "@/classes";
+import { navigationService, SocketService, type StopListen, ReconnectionToast } from "@/classes";
 import { useHistoryStore } from "@/stores/history.ts";
 import { getPageByDeviceType } from "@/utils.ts";
-import { navigationService } from "@/classes/navigation-service.ts";
 import { CONFIG_MESSAGE_DEADLINE } from "@/defaults.ts";
-import type { StopListen } from "@/classes/event-emitter.ts";
 import { useLocalStorage } from "@vueuse/core";
 
 export const useConnectionStore = defineStore("connection", () => {
@@ -18,6 +16,9 @@ export const useConnectionStore = defineStore("connection", () => {
   let stopListenOpen: StopListen | null = null;
   let stopListenError: StopListen | null = null;
 
+  let stopListenReconnected: StopListen | null = null;
+  let stopListenReconnect: StopListen | null = null;
+
   const shouldConnectToRecent = useLocalStorage("shouldConnectToRecent", false);
 
   const currentConnection = shallowRef<SocketService | null>(null);
@@ -26,7 +27,7 @@ export const useConnectionStore = defineStore("connection", () => {
   const isConnected = computed(() => currentConnection.value?.isConnected.value || false);
   const isConnecting = computed(() => pendingConnection.value?.isConnecting.value || false);
 
-  const currentAddress = computed(() => (isConnected.value ? currentConnection.value!.address : null));
+  const currentAddress = computed(() => currentConnection.value?.address || null);
   const currentError = computed(() => currentConnection.value?.error || null);
 
   const pendingAddress = computed(() => (isConnecting.value ? pendingConnection.value!.address : null));
@@ -34,6 +35,8 @@ export const useConnectionStore = defineStore("connection", () => {
 
   const config = ref<Config | null>(null);
   const deviceType = computed(() => (isConnected.value ? config.value?.deviceType || null : null));
+
+  const reconnectionToast = ReconnectionToast.GetInstance();
 
   const connect = (address: string) => {
     address = address.trim();
@@ -72,13 +75,18 @@ export const useConnectionStore = defineStore("connection", () => {
 
   const onConnect = async (socket: SocketService) => {
     stopListenOpen!();
+    stopListenError!();
+    commitConnection(socket);
+    setupConfigListener(socket);
+  };
+
+  const setupConfigListener = (socket: SocketService) => {
     stopListenConfig = socket.on("receivedMessage", (event) => {
       const { data: rawData } = event;
       const { type, value } = JSON.parse(rawData);
       if (type === "configUpdate") {
         clearTimeout(configDeadlineTimeout);
         stopListenConfig!();
-        commitConnection(socket);
 
         console.log("CONFIG", value);
         const { deviceType } = value as Config;
@@ -91,7 +99,6 @@ export const useConnectionStore = defineStore("connection", () => {
     configDeadlineTimeout = setTimeout(() => {
       console.log("CONFIG DEADLINE");
       stopListenConfig!();
-      commitConnection(socket);
       navigationService.navigateTo(PageName.Connect);
     }, CONFIG_MESSAGE_DEADLINE);
   };
@@ -102,11 +109,28 @@ export const useConnectionStore = defineStore("connection", () => {
     disconnectCurrent();
     pendingConnection.value = null;
     currentConnection.value = socket;
+    setupReconnection(socket);
+  };
+
+  const setupReconnection = (socket: SocketService) => {
+    socket.enableReconnect();
+
+    stopListenReconnect = socket.on("reconnect", () => {
+      reconnectionToast.reconnecting();
+    });
+
+    stopListenReconnected = socket.on("open", () => {
+      reconnectionToast.reconnected();
+    });
   };
 
   const disconnectCurrent = () => {
     config.value = null;
     if (currentConnection.value) {
+      stopListenReconnected!();
+      stopListenReconnect!();
+      reconnectionToast.close();
+      currentConnection.value.disableReconnect();
       currentConnection.value.disconnect();
       currentConnection.value = null;
     }
