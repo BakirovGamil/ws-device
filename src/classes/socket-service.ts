@@ -8,6 +8,7 @@ type SocketServiceEvents = {
   open: Event;
   close: CloseEvent;
   error: Event;
+  reconnect: undefined;
 };
 
 export class SocketService extends EventEmitter<SocketServiceEvents> {
@@ -21,6 +22,10 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
 
   private queueEnabled = false;
   private queue: MessageEvent[] = [];
+
+  private reconnectionAttempt = 0;
+  private isReconnecting = false;
+  private reconnectEnabled = false;
 
   constructor(address: string) {
     super();
@@ -49,16 +54,25 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
       return;
     }
 
-    this.cleanupState();
-    this.cleanupSocketListeners(this.socket);
-    this.socket.close();
-    this.socket = null;
+    this.cleanupConnectionState();
+    this.cleanupReconnectionState();
+    this.closeSocket();
   }
 
   send(data: string) {
     if (this.socket) {
       this.socket.send(data);
     }
+  }
+
+  enableReconnect() {
+    console.log("reconnect enabled");
+    this.reconnectEnabled = true;
+  }
+
+  disableReconnect() {
+    console.log("reconnect disabled");
+    this.reconnectEnabled = false;
   }
 
   enableQueue() {
@@ -72,6 +86,31 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
     this.queueEnabled = false;
     this.flushQueue();
     this.emit("queue", false);
+  }
+
+  private closeSocket() {
+    if(!this.socket) {
+      return;
+    }
+
+    this.cleanupSocketListeners(this.socket);
+    this.socket.close();
+    this.socket = null;
+  }
+
+  private reconnect() {
+    if (!this.reconnectEnabled) {
+      return;
+    }
+
+    if (!this.isReconnecting) {
+      this.isReconnecting = true;
+      this.emit("reconnect", undefined);
+    }
+
+    this.reconnectionAttempt++;
+    this.closeSocket();
+    this.connect();
   }
 
   private flushQueue() {
@@ -99,25 +138,32 @@ export class SocketService extends EventEmitter<SocketServiceEvents> {
     socket.onmessage = null;
   }
 
-  private cleanupState() {
+  private cleanupConnectionState() {
     this.isConnected.value = false;
     this.isConnecting.value = false;
+  }
+
+  private cleanupReconnectionState() {
+    this.isReconnecting = false;
+    this.reconnectionAttempt = 0;
   }
 
   private onOpen(ev: Event) {
     this.isConnected.value = true;
     this.isConnecting.value = false;
+    this.cleanupReconnectionState();
     this.emit("open", ev);
   }
 
   private onClose(ev: CloseEvent) {
-    this.cleanupState();
+    this.cleanupConnectionState();
     this.emit("close", ev);
   }
 
   private onError(ev: Event) {
     this.error.value = new Error("Socket error");
     this.emit("error", ev);
+    this.reconnect();
   }
 
   private onMessage(ev: MessageEvent) {
