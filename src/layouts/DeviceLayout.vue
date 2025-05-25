@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col h-full">
     <header class="flex-grow-0 sticky w-full top-0 left-0 bg-neutral-950 z-50">
-      <div class="flex gap-2 max-w-screen-xl p-2 sm:p-4 mx-auto bg-zinc text-neutral-200">
-        <ConnectionSelector class="max-w-56" />
+      <div class="flex gap-2 max-w-screen-xl p-4 mx-auto bg-zinc text-neutral-200">
+        <ConnectionSelector class="max-w-64" />
         <DeviceState :state="state" @set:state="onSetState" />
       </div>
     </header>

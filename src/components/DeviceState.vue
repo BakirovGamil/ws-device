@@ -25,7 +25,7 @@ const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 
 const state = computed({
-  get: () => props.state,
+  get: () => props.state || "Ожидаем состояние...",
   set: (v: string) => emit("set:state", v),
 });
 
@@ -46,6 +46,10 @@ const type = computed(() => {
 
   if(state.value === "Неизвестный статус") {
     return "default";
+  }
+
+  if(state.value === "Ожидаем состояние...") {
+    return "info";
   }
 
   return "primary";
