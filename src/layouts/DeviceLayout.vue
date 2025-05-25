@@ -10,10 +10,10 @@
       <n-back-top :right="100" />
       <div class="max-w-screen-xl mx-auto space-y-2 sm:space-y-4 h-full p-2 sm:p-4 sm:pt-10 bg-zinc-900">
         <div class="flex gap-2 sm:gap-4">
-          <div class="bg-zinc-800 rounded-lg shadow-lg p-2 sm:p-4 pt-2 flex flex-col basis-64 gap-2">
+          <div class="bg-zinc-800 rounded-lg shadow-lg p-2 sm:p-4 pt-2 flex flex-col basis-60 sm:basis-64 gap-2">
             <InputsRelays
               class="self-start shadow-none"
-              content-class="!px-0 !text-left"
+              content-class="!px-0 !text-left first:pt-0"
               :inputs="inputs"
               :relays="relays"
               @set:input="onSetSingleInputs"

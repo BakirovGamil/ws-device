@@ -1,21 +1,25 @@
 <template>
   <div class="@container flex flex-col gap-2">
-    <div class="grid gap-2 @[300px]:grid-cols-2 @[425px]:grid-cols-3 @[560px]:grid-cols-4 @[600px]:max-w-[700px]">
-      <template v-for="btn in buttons" :key="btn.key">
-        <HotkeyButton v-if="btn.model" v-model:toggle-value="btn.model.value" :hotkey="btn.hotkey">
-          {{ btn.label }}
+    <div class="grid gap-2 max-w-80 @[320px]:grid-cols-2">
+      <div class="flex flex-col gap-2">
+        <template v-for="btn in buttons" :key="btn.key">
+          <HotkeyButton v-if="btn.model" v-model:toggle-value="btn.model.value" :hotkey="btn.hotkey">
+            {{ btn.label }}
+          </HotkeyButton>
+          <HotkeyButton v-else :hotkey="btn.hotkey" :action="btn.action">
+            {{ btn.label }}
+          </HotkeyButton>
+        </template>
+      </div>
+      <div class="flex flex-col gap-2">
+        <HotkeyButton
+          v-model:toggle-value="hotkeyActions.voiceCall.model!.value"
+          :hotkey="hotkeyActions.voiceCall.hotkey"
+        >
+          Вызов
         </HotkeyButton>
-        <HotkeyButton v-else :hotkey="btn.hotkey" :action="btn.action">
-          {{ btn.label }}
-        </HotkeyButton>
-      </template>
-      <HotkeyButton
-        v-model:toggle-value="hotkeyActions.voiceCall.model!.value"
-        :hotkey="hotkeyActions.voiceCall.hotkey"
-      >
-        Вызов
-      </HotkeyButton>
-      <PlateNumberInput @recognize-plate-number="recognizePlateNumber" />
+        <PlateNumberInput @recognize-plate-number="recognizePlateNumber" />
+      </div>
     </div>
   </div>
 </template>
