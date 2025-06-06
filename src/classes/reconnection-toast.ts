@@ -11,7 +11,7 @@ export class ReconnectionToast {
   private reconnectedTimeout: number | null = null;
 
   private readonly RECONNECTED_DURATION = 2000;
-  private readonly MAX_WIDTH = "350px";
+  private readonly MAX_WIDTH = "400px";
   private readonly RECONNECTING_MESSAGE = "Потеряли соединение, но не надежду!";
   private readonly RECONNECTED_MESSAGE = "Соединение восстановлено";
 

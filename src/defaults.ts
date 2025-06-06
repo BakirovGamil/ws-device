@@ -8,6 +8,7 @@ export const MIN_SCANNER_COUNT = 1;
 export const MAX_SCANNER_COUNT = 5;
 export const MAX_SCANNER_HISTORY = 10;
 export const CONFIG_MESSAGE_DEADLINE = 10_000;
+export const EMPTY_STATE_MESSAGE = "Ожидаем состояние...";
 export const STATES = [
   "regular",
   "outOfService",

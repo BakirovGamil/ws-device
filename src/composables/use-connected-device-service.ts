@@ -7,7 +7,7 @@ export function useConnectedDeviceService(onDisconnect?: () => void) {
   const service = useDeviceService();
   const connection = useConnectionStore();
   let timeout: ReturnType<typeof setTimeout>;
-  let cleanupSocketListeners: () => void | null = null;
+  let cleanupSocketListeners: (() => void) | null = null;
 
   watch(
     () => connection.currentConnection,
@@ -39,7 +39,7 @@ export function useConnectedDeviceService(onDisconnect?: () => void) {
     });
 
     const stopClose = socket.on("close", () => {
-      onDisconnect();
+      onDisconnect?.();
     });
 
     return () => {

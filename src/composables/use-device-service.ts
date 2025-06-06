@@ -7,14 +7,16 @@ import type {
   Inputs,
   Log,
   LogLevel,
-  MessageData, RawTicket,
+  MessageData,
+  RawTicket,
   Relays,
   ScannerData,
   Ticket,
 } from "@/types";
+import { EMPTY_STATE_MESSAGE } from "@/defaults.ts";
 
 export function useDeviceService() {
-  const state = ref("Неизвестный статус");
+  const state = ref(EMPTY_STATE_MESSAGE);
   const logs = ref<Log[]>([]);
   const inputs = ref(createEmptyInputsRelays("inputs"));
   const relays = ref(createEmptyInputsRelays("relays"));
@@ -24,7 +26,7 @@ export function useDeviceService() {
   const emitter = new EventEmitter<DeviceServiceEvents>();
 
   const resetState = () => {
-    state.value = "Неизвестный статус";
+    state.value = EMPTY_STATE_MESSAGE;
     logs.value = [];
     inputs.value = createEmptyInputsRelays("inputs");
     relays.value = createEmptyInputsRelays("relays");

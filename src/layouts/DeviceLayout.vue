@@ -1,11 +1,6 @@
 <template>
   <div class="flex flex-col h-full">
-    <header class="flex-grow-0 sticky w-full top-0 left-0 bg-neutral-950 z-50">
-      <div class="flex gap-2 max-w-screen-xl p-4 mx-auto bg-zinc text-neutral-200">
-        <ConnectionSelector class="max-w-64" />
-        <DeviceState :state="state" @set:state="onSetState" />
-      </div>
-    </header>
+    <AppHeader :state="state" @set:state="onSetState" />
     <n-scrollbar class="flex-1">
       <n-back-top :right="100" />
       <div class="max-w-screen-xl mx-auto space-y-2 sm:space-y-4 h-full p-2 sm:p-4 sm:pt-10 bg-zinc-900">
@@ -48,8 +43,8 @@
 import type { CardData, Inputs, Log, Relays, ScannerData, SetInputEvent, Ticket } from "@/types.ts";
 import { NBackTop, NButton, NScrollbar } from "naive-ui";
 import { useVModel } from "@vueuse/core";
-import ConnectionSelector from "@/components/ConnectionSelector.vue";
-import DeviceState from "@/components/DeviceState.vue";
+import { useConnectionStore } from "@/stores/connection.ts";
+import AppHeader from "@/components/AppHeader.vue";
 import DeviceLogs from "@/components/DeviceLogs.vue";
 import StateInput from "@/components/StateInput.vue";
 import ErrorInput from "@/components/ErrorInput.vue";
@@ -60,7 +55,6 @@ import InputsRelays from "@/components/InputsRelays.vue";
 import ParkingTicket from "@/components/ParkingTicket.vue";
 import ShutdownButton from "@/components/ShutdownButton.vue";
 import DeviceWindow from "@/components/device-window/DeviceWindow.vue";
-import { useConnectionStore } from "@/stores/connection.ts";
 
 interface Emits {
   (e: "set:state", state: string): void;

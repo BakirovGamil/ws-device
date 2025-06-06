@@ -12,6 +12,7 @@
 import { computed } from "vue";
 import { NTag, NPopselect } from "naive-ui";
 import { useStateOptions } from "@/composables/use-state-options.ts";
+import { EMPTY_STATE_MESSAGE } from "@/defaults.ts";
 
 interface Emits {
   (e: "set:state", v: string): void;
@@ -25,7 +26,7 @@ const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 
 const state = computed({
-  get: () => props.state || "Ожидаем состояние...",
+  get: () => props.state || EMPTY_STATE_MESSAGE,
   set: (v: string) => emit("set:state", v),
 });
 
@@ -44,11 +45,7 @@ const type = computed(() => {
     return "info";
   }
 
-  if(state.value === "Неизвестный статус") {
-    return "default";
-  }
-
-  if(state.value === "Ожидаем состояние...") {
+  if(state.value === EMPTY_STATE_MESSAGE) {
     return "info";
   }
 
