@@ -1,6 +1,6 @@
 import { readonly, ref, shallowRef } from "vue";
 import { createEmptyInputsRelays, ticketFromRaw } from "@/utils";
-import { EventEmitter, SocketService } from "@/classes";
+import { DeviceStateWaitPool, EventEmitter, SocketService } from "@/classes";
 import type {
   CardData,
   DeviceServiceEvents,
@@ -24,6 +24,7 @@ export function useDeviceService() {
 
   const socket = shallowRef<SocketService | null>(null);
   const emitter = new EventEmitter<DeviceServiceEvents>();
+  const waitPool = new DeviceStateWaitPool();
 
   const resetState = () => {
     state.value = EMPTY_STATE_MESSAGE;
@@ -35,6 +36,7 @@ export function useDeviceService() {
 
   const setSocket = (newSocket: SocketService | null) => {
     socket.value?.off("message", onMessage);
+    waitPool.rejectAll(new Error("Socket disconnected"));
     resetState();
 
     socket.value = newSocket;
@@ -115,6 +117,7 @@ export function useDeviceService() {
       case "newState":
         state.value = value as string;
         emitter.emit("newState", value as string);
+        waitPool.notifyAll(value as string);
         break;
       case "debugPrintTicket":
         const ticketData = ticketFromRaw(data as unknown as RawTicket);
@@ -203,6 +206,10 @@ export function useDeviceService() {
     });
   };
 
+  const waitForState = async (state: string): Promise<void> => {
+    return waitPool.waitFor(state);
+  };
+
   return {
     state: readonly(state),
     logs: readonly(logs),
@@ -221,6 +228,7 @@ export function useDeviceService() {
     sendCard,
     sendScanner,
     shutDown,
+    waitForState,
 
     on: emitter.on.bind(emitter),
     off: emitter.off.bind(emitter),
