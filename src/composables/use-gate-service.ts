@@ -1,4 +1,4 @@
-import { computed, onUnmounted } from "vue";
+import { computed, onUnmounted, ref } from "vue";
 import { useConnectedDeviceService } from "./use-connected-device-service.ts";
 import type { InputKey } from "@/types.ts";
 
@@ -31,7 +31,7 @@ export const useGateService = () => {
   onUnmounted(cleanupTimeouts);
 
   const service = useConnectedDeviceService(cleanupTimeouts);
-  const { inputs, setSingleInput } = service;
+  const { inputs, setSingleInput, waitForState } = service;
 
   const createInputControl = (inputKey: InputKey, disableTimeout?: number) => {
     const index = +inputKey.slice(2) - 1;
@@ -60,13 +60,46 @@ export const useGateService = () => {
     service.send({ type: "mock.setPlateNum", value: plateNumber });
   };
 
+  const isAutoProcessActive = ref(false);
+  const autoProcessError = ref<Error | null>(null);
+
+  const makeOneTimeVisit = async () => {
+    isAutoProcessActive.value = true;
+    autoProcessError.value = null;
+
+    try {
+      firstLoop.value = true;
+      await waitForState("active");
+
+      ticketPrint.value = true;
+      await waitForState("ticketPrint");
+      pickupTicket();
+
+      await waitForState("ticketPickUp");
+
+      await waitForState("waiting");
+      secondLoop.value = true;
+      await waitForState("finish");
+
+    } catch (err) {
+      autoProcessError.value = err as Error;
+      console.error("Error in makeOneTimeVisit", err);
+    } finally {
+      firstLoop.value = false;
+      secondLoop.value = false;
+      isAutoProcessActive.value = false;
+    }
+  };
+
   return {
     firstLoop,
     secondLoop,
     ticketPrint,
     voiceCall,
+    isAutoProcessActive,
     pickupTicket,
     recognizePlateNumber,
+    makeOneTimeVisit,
     ...service,
   };
 };

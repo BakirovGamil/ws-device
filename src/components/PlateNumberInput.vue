@@ -1,7 +1,12 @@
 <template>
   <n-input-group>
-    <n-input v-model:value="plateNumber" placeholder="A777AA77" />
-    <HotkeyButton title="Распознать номер" :disabled="!plateNumber" hotkey="Shift+Y" :action="recognizePlateNumber">
+    <n-input :disabled="disabled" v-model:value="plateNumber" placeholder="A777AA77" />
+    <HotkeyButton
+      title="Распознать номер"
+      :disabled="!plateNumber || disabled"
+      hotkey="Shift+Y"
+      :action="recognizePlateNumber"
+    >
       <template #icon>
         <n-icon>
           <videocam-filled />
@@ -21,6 +26,11 @@ interface Emits {
   (e: "recognizePlateNumber", plateNumber: string): void;
 }
 
+interface Props {
+  disabled?: boolean;
+}
+
+defineProps<Props>();
 const emit = defineEmits<Emits>();
 const plateNumber = useLocalStorage("recognitionPlateNumber", "");
 

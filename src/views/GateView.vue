@@ -17,12 +17,14 @@
   >
     <template #controls>
       <GateControls
+        :is-auto-process-active="isAutoProcessActive"
         v-model:first-loop="firstLoop"
         v-model:second-loop="secondLoop"
         v-model:ticket-print="ticketPrint"
         v-model:voice-call="voiceCall"
         @recognize-plate-number="recognizePlateNumber"
         @pickup-ticket="pickupTicket"
+        @make-one-time-visit="makeOneTimeVisit"
       />
     </template>
   </DeviceLayout>
@@ -55,6 +57,8 @@ const {
   sendScanner,
   shutDown,
   clearLogs,
+  makeOneTimeVisit,
+  isAutoProcessActive,
 } = useGateService();
 
 const onSetSingleInput = ({ num, enabled }: SetInputEvent) => {

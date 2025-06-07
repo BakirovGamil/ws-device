@@ -1,5 +1,5 @@
 export class DeviceStateAwaiter {
-  private readonly DEFAULT_TIMEOUT = 2000;
+  private readonly DEFAULT_TIMEOUT = 5000;
   private timeoutId: ReturnType<typeof setTimeout> | null = null;
   private targetState: string | null = null;
   private stateResolve: (() => void) | null = null;
@@ -18,7 +18,6 @@ export class DeviceStateAwaiter {
 
   onStateUpdated(newState: string) {
     if (newState === this.targetState && this.stateResolve) {
-      this.clearPending();
       this.stateResolve();
     }
   }
