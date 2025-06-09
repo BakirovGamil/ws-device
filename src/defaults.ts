@@ -17,5 +17,6 @@ export const STATES = [
   "ticketPrint",
   "ticketPickUp",
   "waiting",
+  "finish"
 ];
 export const WINDOW_ALERT_MESSAGE = "Это не дублирование экрана, а отдельное окно";
